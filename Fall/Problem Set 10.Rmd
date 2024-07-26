@@ -1,0 +1,104 @@
+---
+title: "Problem Set 10"
+author: "Eric Zhou"
+date: "2022-10-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**: Nominal, names of what States, assuming we want names of States and there's no defined order
+#### **Part b**: Discrete, assuming that money is not continuous since you can't really have half a cent so the number of cents has to be a discrete number
+#### **Part c**: Discrete, assuming that you would just round to the nearest gun or nearest thousand guns or whatever because you wouldn't really count gun parts as a fraction of a gun
+#### **Part d**: Discrete, can't have part of a human so it has to be a number
+#### **Part e**: Binary, assuming that we are only categorizing into True, there is availability, or False, there is no availability
+#### **Part f**: Discrete, assuming that money is not continuous since you can't really have half a cent so the number of cents has to be a discrete number
+<br>
+
+## **Problem 2**
+```{r}
+section1 <- c(92, 88, 100, 96, 80, 82, 85, 93, 81, 95, 84, 92, 93, 90, 92)
+section2 <- c(92, 90, 99, 95, 78, 81, 83, 94, 75, 98, 94, 96, 94, 89)
+```
+
+#### **Part a**: Section 1 has 89.53333 (mean), 92 (median), and 92(mode), Section 2 has 89.85714 (mean), 93 (median), and 94 (mode)
+```{r}
+mean(section1)
+mean(section2)
+median(section1)
+median(section2)
+table(section1) # Mode is 92
+table(section2) # Mode is 94
+```
+
+#### **Part b**: Section 1 has 15, Section 2 has 14
+```{r}
+length(section1)
+length(section2)
+```
+
+#### **Part c**: 
+```{r}
+sort(section1)
+sort(section2)
+```
+
+#### **Part d**: Changing freq changes the unity of the y-axis from frequency to density 
+```{r}
+hist(section1, freq=TRUE)
+hist(section2, freq=FALSE)
+```
+
+#### **Part e**: Section 2 has higher mean and median scores so I would say they did better.
+#### **Part f**: It is the exact same
+```{r}
+sum(section1)/length(section1)
+```
+<br>
+
+## **Problem 3**
+```{r}
+temps <- c(71, 71, 69, 71, 69, 72, 71, 70, 70, 71, 82, 76, 74, 73, 74, 82, 82, 77, 80, 83, 83, 81, 72, 72, 71, 72, 72, 71, 72, 72, 73)
+```
+
+#### **Part a**: It plotted the index of the temperature in the list with the temperature value
+```{r}
+plot(temps)
+```
+
+#### **Part b**: 31
+```{r}
+length(temps)
+```
+
+#### **Part c**: 
+```{r}
+li <- seq(1:length(temps))
+```
+
+#### **Part d**: The same because the index values are also start from 1 and increase, same as the Day number
+```{r}
+plot(x=li, y=temps, xlab="Day")
+```
+
+#### **Part e**: I think the line plot is a bit clearer because it shows the connections between points
+```{r}
+plot(x=li, y=temps, xlab="Day", type='l')
+```
+<br>
+
+## **Problem 4**
+```{r}
+section1[5] <- 83
+```
+
+#### **Part a**: Mean went from 89.53333 to 89.733333, Median remained at 92
+```{r}
+mean(section1)
+median(section1)
+```
+
+#### **Part b**: Mean changed since one of the values are different, meaning the sum is different while the total number of students stayed the same. The median remained the same because 85 was less than the medium, same as the original score of 80.

@@ -1,0 +1,177 @@
+---
+title: "Assignment 4"
+author: "Eric Zhou"
+date: "2022-10-20"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Apprentice**
+
+## Problem 1
+
+```{r}
+orca <- c(71, 80, 80, 82, 84, 82, 79, 76, 74, 77, 81, 84, 85, 85, 88, 92, 91, 97, 96, 98, 97, 92, 89, 85, 82, 78, 79, 82, 83, 88, 89, 86, 85, 85, 86, 87, 84, 82, 78, 81, 83, 77, 75, 73, 74, 73)
+years <- seq(1976, 2021, 1)
+```
+
+#### **Part a**: There's no overall pattern. Looks like it kind of grew from 1976 to 1996 but has been on a downward trend since then.
+
+```{r}
+plot(x=orca, y=years, type='b', ylab='Year', xlab='Orca Count', main='Count of Orcas by Year (1976 - 2021)')
+```
+
+#### **Part b**: Discrete since you can't have half an orca. An example of continuous is the size of the area that the orcas are in.
+
+#### **Part c**: It shows how normal the distribution is and how often each count occurs across the years rather than trend as the years progress.
+
+```{r}
+hist(orca, freq=FALSE, breaks=10, xlab='Orca Count', main='Density of Count of Orcas')
+```
+
+#### **Part d**: Maximum of 98 in 1995 and minimum of 71 in 1976.
+
+```{r}
+max(orca)
+min(orca)
+years[orca==max(orca)]
+years[orca==min(orca)]
+```
+
+#### **Part e**: Mean is 83.36957 orcas and median is 83 orcas. It's a pretty normal distribution so both mean and median are pretty close together. Overall, it looks like the mean is closer to the middle to me but the median is the actual middle value of the dataset. I still think it depends on what exactly you were looking for though. For overall middle, I would probably use median since it will be a whole number, it's the actual middle of the dataset, and it ignores outliers on the edges.
+
+```{r}
+mean(orca)
+median(orca)
+hist(orca, freq=FALSE, breaks=10, xlab='Orca Count', main='Density of Count of Orcas (1976 - 2021)')
+abline(v=mean(orca), col='blue')
+abline(v=median(orca), col='orange')
+```
+
+#### **Part f**: I believe the difference between the top and bottom of the box is equal to the IQR since it's the 0.25 and 0.75 quantiles, which are 79 and 86.75 respectively.
+
+```{r}
+boxplot(orca, ylab='Orca Count', main='Count of Orcas (1976 - 2021)')
+IQR(orca)
+quantile(orca, c(0.25, 0.75))
+```
+
+#### **Part g**: 44.19372 orcas squared for variance, 6.647836 orcas for standard deviation. I think this interval will most likely include the likely range of counts since it pretty much includes all values except for the lowest and the highest values.
+
+```{r}
+var(orca)
+sd(orca)
+hist(orca, freq=FALSE, breaks=10, xlab='Orca Count', main='Density of Count of Orcas (1976 - 2021)')
+abline(v=mean(orca) + 2*sd(orca), lty=2, col='green')
+abline(v=mean(orca) - 2*sd(orca), lty=2, col='green')
+```
+
+#### **Part h**: I think it would be somewhat surprising but not too much. 85 is a pretty commonly occuring number, in fact, it is one of the most repeated in the dataset. The reason I said it would be somewhat surprising is because of the downwards trend recently but it is possible to spike back up a bit.
+
+<br>
+
+# **Master**
+
+## Problem 2
+
+#### **Part a**: Kind of already did this for 1a, not sure what 1a was supposed to be.
+
+```{r}
+plot(x=years, y=orca, type='b', xlab='Year', ylab='Orca Count', main='Count of Orcas by Year (1976 - 2021)')
+```
+
+#### **Part b**: They are both 83.36957.
+$$
+\text{mean} = \frac{\sum_{i=0}^{n}x_{i}}{n} \rightarrow \frac{3835}{46}\approx83.36957
+$$
+
+```{r}
+mean(orca)
+median(orca)
+sum(orca)
+length(orca)
+sum(orca)/length(orca)
+```
+
+#### **Part c**: They are both 6.647836
+$$
+sd =\sqrt{\frac{\sum_{i=0}^{n}\left(x_{i}-\bar{x}\right)^{2}}{n-1}} \rightarrow \sqrt{\frac{\text{sum}(\text{orca} - 83.36957)^{2}}{46-1}}=\sqrt{\frac{1988.717}{45}}\approx6.647836
+$$
+
+```{r}
+sd(orca)
+avg <- mean(orca)
+diff <- orca - avg
+sum(diff^2)
+sqrt(sum(diff^2)/(length(orca)-1))
+```
+
+#### **Part d**: Most repeated are 82 and 85 with 5 occurences. Modes are 82 and 85.
+
+```{r}
+table(orca)
+```
+
+#### **Part e**: 30.43%. Years are: 1990 1991 1992 1993 1994 1995 1996 1997 1998 2005 2006 2007 2010 2011
+
+```{r}
+sum(orca > 85)/length(orca)
+years[orca > 85]
+```
+
+#### **Part f**: 28.26% had below 80 and 56.52% were between 80 and 90.
+
+```{r}
+sum(orca < 80)/length(orca)
+sum(orca >= 80 & orca <= 90)/length(orca)
+```
+
+#### **Part g**: 95% were about 73.25 orcas, or 73 if we round to the nearest one.
+
+```{r}
+quantile(orca, 0.05)
+```
+
+#### **Part h**: About 1 standard deviation
+
+```{r}
+(90 - mean(orca)) / sd(orca)
+```
+
+<br>
+
+# **Wizard**
+
+## Problem 3
+
+#### **Part a**: I learned about the naming system of the orcas with letters based on the different pods and numbers based on when they were born. I think it's interesting how closely the orcas are being watched. They can somehow track every birth and also figure out when an orca passes away. They also have graphs on the population of orcas by pods and the total number as well. I learned about the taskforce that is responsible for protecting orcas and how they make recommendations for legislation and are able to get funding and plan out how to invest the money to solve problems. I also learned about how salmon recovery is beneficial to the orcas.
+
+#### **Part b**: The counts are definitely not random. It goes up when new births happen and goes down whenever an orca dies. In the wild, orcas have an average lifespan of around 50 years so that's a factor as well. Trends also make sense since persisting problems like pollution, overfishing, and boat activities can lead to more deaths than births. Generally, the increase and decrease will not be dramatic, since generally only a few orcas will die and be born each year, unless something major happens like some disease or a new pod moving in to the area.
+
+#### **Part c**:
+
+```{r}
+orca_change <- orca[2:length(orca)] - orca[1:length(orca) - 1]
+orca_change
+```
+
+#### **Part d**: Mean is around 0.044 orcas per year and standard deviation is about 3.13 orcas per year. Generally stays within a small range from -6 to 9. There doesn't seem to be much of a pattern and looks somewhat random but the very start was a lot higher and the rest remained pretty even. The ending portion is still around the mean. Mostly concentrated between -3 to 3, almost a normal distribution centered at 0.
+
+```{r}
+mean(orca_change)
+sd(orca_change)
+plot(x=years[0:-1], y=orca_change, type='l', ylab='Year', xlab='Orca Count Change', main='Change of Orca Population by Year (1977 - 2021)')
+abline(h=mean(orca_change))
+hist(orca_change)
+```
+
+#### **Part e**:
+
+1.  Age of each of the orcas <br>
+2.  Salmon population <br>
+3.  Number of boats traveling through the area

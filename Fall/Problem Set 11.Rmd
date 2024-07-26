@@ -1,0 +1,105 @@
+---
+title: "Problem Set 11"
+author: "Eric Zhou"
+date: "2022-10-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## **Problem 1**
+```{r}
+section1 <- c(92, 88, 100, 96, 80, 82, 85, 93, 81, 95, 84, 92, 93, 90, 92)
+section2 <- c(92, 90, 99, 95, 78, 81, 83, 94, 75, 98, 94, 96, 94, 89)
+```
+
+#### **Part a**: 
+```{r}
+var(section1)  # section 1 variance
+sd(section1)  # section 1 standard dev
+var(section2)  # section 2 variance
+sd(section2)  # section 2 standard dev
+```
+
+#### **Part b**: Unit for variance is points/percentage squared, unit for standard deviation is points/percentage
+#### **Part c**: Section 2 has a larger standard deviation (7.63 compared to 5.96)
+#### **Part d**: Section 1 is 77.61 to 101.46, section 2 is 74.59 to 105.13
+```{r}
+mean(section1) - 2 * sd(section1)
+mean(section1) + 2 * sd(section1)
+mean(section2) - 2 * sd(section2)
+mean(section2) + 2 * sd(section2)
+```
+
+#### **Part e**: Yes because variance is just standard deviation squared
+<br>
+
+## **Problem 2**
+#### **Part a**: 
+```{r}
+enrollment <- c(6414, 1550, 2109, 9350, 21828, 4300, 5944, 5722, 2825, 2044, 5481, 5200, 5853, 2750, 10012, 6357, 27000, 9414, 7681, 3200, 17500, 9200, 7380, 18314, 6557, 13713, 17768, 7493, 2771, 2861, 1263, 7285, 28165, 5080, 11622)
+```
+
+#### **Part b**: 
+```{r}
+hist(enrollment, breaks=10)
+```
+
+#### **Part c**: Still not sure which one is better. Mean is skewed by outliers on either end but median is not good for representing the data as a whole but does get the middle. For this, I think I would say median is better but honestly no clue.
+```{r}
+mean(enrollment)
+median(enrollment)
+```
+
+#### **Part d**: Unit is number of people
+```{r}
+sd(enrollment)
+```
+
+<br>
+
+## **Problem 3**
+#### **Part a**: 
+```{r}
+up_bound = mean(enrollment) + sd(enrollment)
+low_bound = mean(enrollment) - sd(enrollment)
+up_bound
+low_bound
+```
+
+#### **Part b**: 
+```{r}
+hist(enrollment, breaks=10)
+abline(v=up_bound, col='orange')
+abline(v=low_bound, col='orange')
+```
+
+#### **Part c**: 27 schools are within the range
+```{r}
+range_enroll <- enrollment[enrollment > low_bound]
+range_enroll <- range_enroll[range_enroll < up_bound]
+range_enroll
+length(range_enroll)
+```
+
+
+#### **Part d**: Max: 28165, Min: 1263, Range: 26902
+```{r}
+max(enrollment)
+min(enrollment)
+max(enrollment) - min(enrollment)
+```
+
+#### **Part e**: Probably somewhere betwen 1500 and 20000
+<br>
+
+## **Problem 4**:
+```{r}
+sd(section1)
+diffs <- (section1 - mean(section1))^2
+sqrt(sum(diffs)/(length(diffs) - 1))
+```
+

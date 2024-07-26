@@ -1,0 +1,64 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+aw<-read.csv("austin_weather.csv")
+aw<-subset(a, select=-c(2,4:19))
+aw$PrecipitationSumInches[aw$PrecipitationSumInches=="T"]<-.001
+
+```
+
+
+```{r}
+plot(aw$TempAvgF, col=aw$Year, main="Average Temperature over Time", ylab="Average Temperature (F)", xlab="Days")
+```
+#Libraries
+```{r}
+library(lubridate)
+aw$Date<-as.POSIXct(aw$Date)
+aw$Year<-year(aw$Date)
+aw$Month<-month(aw$Date)
+aw$Day<-day(aw$Date)
+aw
+```
+
+```{r}
+plot(aw$TempAvgF[aw$Month==1], col=aw$Month,main="Average Temperature over Time", ylab="Average Temperature (F)", xlab="Days in January every Year")
+```
+
+```{r}
+plot(aw$TempAvgF[aw$Month==7], col=aw$Month,main="Average Temperature over Time", ylab="Average Temperature (F)", xlab="Days in July every Year")
+```
+
+```{r}
+hist(aw$TempAvgF[aw$Month==1],main="Temperature in January", xlab="Average Temperature (F)", ylab="Days in January")
+abline(v=median(aw$TempAvgF[aw$Month==1]))
+```
+
+```{r}
+hist(aw$TempAvgF[aw$Month==7],main="Temperature in July", xlab="Average Temperature (F)", ylab="Days in July")
+abline(v=median(aw$TempAvgF[aw$Month==7]))
+```
+
+```{r}
+boxplot(aw$TempAvgF[aw$Month==1]~aw$Year[aw$Month==1],main="Temperature in January", ylab="Average Temperature (F)", xlab="Years")
+```
+
+```{r}
+boxplot(aw$TempAvgF[aw$Month==7]~aw$Year[aw$Month==7],main="Temperature in July", ylab="Average Temperature (F)", xlab="Years")
+```
+#Libraries
+```{r}
+library(lubridate)
+aw$Date<-as.POSIXct(aw$Date, format="%d")
+aw$Month<-month(aw$Date)
+aw$Day<-day(aw$Date)
+aw$Year<-year(aw$Date)
+aw<-subset(aw, select=-c(1))
+aw[2]<-lapply(aw[2], as.numeric)
+aw
+summary(aw[,1:2])
+```
+
+

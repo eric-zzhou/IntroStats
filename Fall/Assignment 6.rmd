@@ -1,0 +1,319 @@
+---
+title: "Assignment 6"
+author: "Eli Chamberlain and Eric Zhou"
+date: "2022-11-04"
+output: html_document
+---
+
+# Basic Setup
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=TRUE) 
+```
+
+### Libraries
+```{r}
+library(lubridate)  # dates
+library(caTools)  # random splitting
+library(randomForest) # random forest prediction
+library(caret)  # confusion matrix
+library(cvms)  # used for plotting confusion matrices
+library(tibble)
+```
+
+### [Austin Weather Data](https://www.kaggle.com/datasets/grubenm/austin-weather?select=austin_weather.csv)
+```{r}
+data <- read.csv('austin_weather.csv')
+aw <- subset(data, select=-c(2, 4, 5, 7, 8, 10, 11, 13, 14, 16, 17, 19))
+head(aw)
+```
+This is where we start our data analysis, weather data from Austin, Texas. We thought this would be interesting because recently Texas has had more extreme weather events than in the past, so we wanted to see if that had an effect on the overall climate of Texas. First, after looking at the data. We realized it was extremely repetitive and got rid of the highs and lows for each item and just kept the average values. We also looked at the size of our data, we were had 1319 days worth of data spanning from 2013 to July 2017. We found the date, average temperature, percipitation, and events to be the most interesting columns and that is what we decided to focus on. 
+
+# Dealing with Data
+### Cleaning up columns and adding new ones
+```{r}
+# Doing date stuff
+aw$Date<-as.POSIXct(aw$Date)
+aw$Year<-year(aw$Date)
+aw$Month<-month(aw$Date)
+aw$Day<-day(aw$Date)
+
+# Getting rid of bad values (a trace of rain with 0.001)
+aw$PrecipitationSumInches[aw$PrecipitationSumInches == "T"] <- 0.001
+
+# Splitting weather events
+unique(aw$Events)  # Rain, fog, snow, thunderstorm
+aw$Rain <- grepl("Rain", aw$Events, fixed=TRUE)
+aw$Fog <- grepl("Fog", aw$Events, fixed=TRUE)
+aw$Snow <- grepl("Snow", aw$Events, fixed=TRUE)
+aw$Storm <- grepl("Thunderstorm", aw$Events, fixed=TRUE)
+
+# Getting rid of unnecessary columns
+aw <- subset(aw, select=-c(9))
+aw <- aw[,c(1, 9, 10, 11, 2, 3, 4, 6, 7, 5, 14, 13, 15, 8, 12)]
+aw[,c(11:13, 15)] <-lapply(aw[,c(11:13, 15)], as.numeric)
+aw[,c(11:13, 15)] <-lapply(aw[,c(11:13, 15)], factor)
+```
+Here we cleaned up our data so that we could use all of it as intended. This meant inputting .001 inches of precipitation for days that were given a value of "T", which meant trace amounts of precipitation. This also meant converting different events to numerical data, 1s for TRUE and 0s for FALSE. Finally, this meant converting the dates into useable data points, we did this by extracting the month, day, and year of each date. 
+
+
+### Summary of data
+```{r}
+summary_aw <- aw
+summary_aw[,c(2:10, 14)] <- lapply(aw[,c(2:10, 14)], as.numeric)
+summary(summary_aw)
+```
+We took our remaining data points and gave the summary of each of them. This gave us a very easy way to look at and access all of our data highs and lows quickly. 
+
+### Peek into weather data
+```{r}
+length(aw$Rain)
+sum(aw$Rain == 1)
+sum(aw$Fog == 1)
+sum(aw$Snow == 1)
+sum(aw$Storm == 1)
+```
+
+# Graphs for Patterns
+### Austin Temperatures w/ Time
+```{r}
+plot(aw$TempAvgF, col=aw$Year, main="Average Temperature over Time", ylab="Average Temperature (F)", xlab="Days")
+abline(lm(aw$TempAvgF~seq(length(aw$TempAvgF))), col="green")
+```
+
+First we made many graphs between various factors throughout the data. We removed the code for the sake of cleanliness and not to clutter the file too much. We then looked more into relationships we found interesting and created the better graphs you are seeing now.
+
+This is the first graph that we thought would be very interesting: Time versus temperature. We started with a plain graph of time overall (every part of the year). We then separated each year by color and saw 2 very interesting things. The first was that there was a general trend of increasing temperatures, so with that we plotted a trend line to confirm our suspicion. It did, over time the temperature was increasing. The second thing we noticed was that in the beginning of the year (Janurary), the temperatures were much more spread out than during the middle of the year (July). We thought it would be interesting to take both of those months and plot them separately. 
+
+
+### January Temperatures w/ Time
+```{r}
+plot(aw$TempAvgF[aw$Month==1], col=aw$Year[aw$Month==1],main="Average Temperature over Time", ylab="Average Temperature (F)", xlab="Days in January every Year")
+abline(lm(aw$TempAvgF[aw$Month==1]~seq(length(aw$TempAvgF[aw$Month==1]))), col="green")
+```
+
+The first month that we decided to model was January. Immediately we added a trend line that again showed an increase of temperature over time. There also, as we expected, was a lot of variance day by day. Most of the points lay further than 8 degrees away from the line of best fit, for the range of data that we are working with that is a lot. To make each year more clear, we changed each year to a different color and we were able to do that because we had already extracted the year from the date.
+
+
+
+### July Temperatures w/ Time
+
+```{r}
+plot(aw$TempAvgF[aw$Month==7], col=aw$Year[aw$Month==7],main="Average Temperature over Time", ylab="Average Temperature (F)", xlab="Days in July every Year")
+abline(lm(aw$TempAvgF[aw$Month==7]~seq(length(aw$TempAvgF[aw$Month==7]))), col="green")
+```
+
+```{r}
+janmonths <- seq(0, 124, 31)
+jultemps <- aw$TempAvgF[aw$Month==7]
+julmin <- min(jultemps)
+julrang <- (max(jultemps) - julmin) / 10
+plot(jultemps, col=hcl.colors(10, palette="OrRd")[10-(round((jultemps - julmin)/julrang))], main="July Average Temperatures (2014 - 2017)", ylab="Average Temperature (\u00B0F)", xlab="Year", xaxt="n", ylim=c(80, 92))
+axis(1, at = janmonths, labels = seq(2014, 2018)) 
+for (mon in janmonths) {
+  abline(v=mon, lty="dashed", col=adjustcolor("black", alpha=0.25))
+}
+abline(lm(jultemps~seq(length(jultemps))), col=adjustcolor("green", alpha=0.5))
+```
+
+For this second graph we made the same model, but with July. Again, we started with giving a line of best fit. This time however we came to the conclusion that the temperatures were increasing more rapidly than in January and we attributed that to the more extreme temperatures, we think that the increase of temperature is by percent, and with higher temperatures there will be a larger value of change. This graph also was a lot closer, there was significantly less variance than in January. Most of the data lay within 6 degrees of the trend line. 
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+aw %>% filter(Month == 7) %>% ggplot(aes(x = as.factor(Year), y = TempAvgF, fill=as.factor(Year))) +
+  ylim(82,93) +
+  labs(title="July Average Temperatures (2014 - 2017)", x="Year", y="Average Temperature (\u00B0F)")+
+  theme_classic() +
+  theme(legend.position="none", plot.title = element_text(hjust = 0.5)) +
+  geom_boxplot(outlier.color="black") +
+  scale_fill_brewer(palette=14)
+```
+
+
+### January Temperature Distribution
+```{r}
+hist(aw$TempAvgF[aw$Month==1], main="Temperature in January", xlab="Average Temperature (F)", ylab="Days in January")
+abline(v=median(aw$TempAvgF[aw$Month==1]))
+abline(v=mean(aw$TempAvgF[aw$Month==1] + 2 * sd(aw$TempAvgF[aw$Month==1])))
+abline(v=mean(aw$TempAvgF[aw$Month==1] - 2 * sd(aw$TempAvgF[aw$Month==1])))
+```
+
+We wanted to know more about the variation of our data, so we decided to put it into a histogram. This proved our thoughts that there was a great deal of variance in January. The outer lines of the histogram represent 95% of our data and were found by adding or subtracting 2 times the standard deviation of the data. this means that 95% of the temperatures in January fall between 32 and 72 degrees. That is a very large range, and by taking the 95% it generally weeds out the outliers, so this proves generally high variance in temperatures in January. 
+
+### July Temperature Distribution
+```{r}
+hist(aw$TempAvgF[aw$Month==7],main="Temperature in July", xlab="Average Temperature (F)", ylab="Days in July")
+abline(v=median(aw$TempAvgF[aw$Month==7]))
+abline(v=mean(aw$TempAvgF[aw$Month==7] + 2 * sd(aw$TempAvgF[aw$Month==7])))
+abline(v=mean(aw$TempAvgF[aw$Month==7] - 2 * sd(aw$TempAvgF[aw$Month==7])))
+```
+
+We did exactly the same things for July as we did for January and it again confirmed our suspicions. When we took the middle 95% of the data, we found that the range was from 81 to 91, one fourth of the range of January. This, for our data, is a very low range and shows a very low variance. 
+
+
+### January Temperature Boxplots
+```{r}
+boxplot(aw$TempAvgF[aw$Month==1]~aw$Year[aw$Month==1],main="Temperature in January", ylab="Average Temperature (F)", xlab="Years")
+```
+
+To make sure that there was not any one year that throws off all of our data, as the histogram takes the temperatures from all the years and combines it into one, we made boxplots to represent each year. These boxplots showed that there was not one year that truly threw off the data. In 2016, there was less varience in the data, but it is not extreme enough
+to make a large difference in the data. also, the median for 2017 is higher than the rest, but again, it is not extreme enough to make a big difference. There are also only 3 outliers of the 124 total days in January so that means our data is pretty consistent. 
+
+### July Temperature Boxplots
+```{r}
+boxplot(aw$TempAvgF[aw$Month==7]~aw$Year[aw$Month==7],main="Temperature in July", ylab="Average Temperature (F)", xlab="Years")
+```
+
+We did the exact same thing for July as we did January. This again proved that the variance is a lot lower than that of January as both the whiskers and the box part of the plot are significantly smaller and represent a much smaller range. This set of plots however also shows consistent increase of temperature over the course of the four years as the highest end of the box increases each year. 
+
+# Rain Prediction Model
+### Splitting data
+```{r}
+set.seed(49301)
+ind <- sample.split(Y=aw, SplitRatio=0.8)
+trainData <- aw[ind,]
+testData <- aw[!ind,]
+length(trainData$Date)
+length(testData$Date)
+```
+
+Here, to properly test the model, I split the data into a training set with 80% of the data and a testing set with 20% of the data. I used the length part to check to make sure the proportions are about right.
+
+### Creating random forest
+```{r}
+start <- Sys.time()
+forest <- randomForest(formula=Rain~.-PrecipitationSumInches, data=trainData)  # dropping precipitation for prediction
+end <- Sys.time()
+(time <- end - start)  # total time for forest
+forest  # forest information
+```
+I trained the default random forest on the training set after removing the precipitation (since that is clearly indicative of rain), the model seems to do pretty well on training data.
+
+```{r}
+varImpPlot(forest)  # plot of importance of each variable
+```
+
+This is a plot that shows the importance of each variable in the forest, specifically how much each variable decreases the error.
+
+
+### Looking at relationships
+```{r}
+boxplot(as.numeric(aw$PrecipitationSumInches) ~ as.numeric(aw$Rain), xlab="Rain (1 = N, 2 = Y)", ylab="Total Precipitation (in)", main="Precipitation Depending on Rain", ylim=c(0, 1.5))
+```
+
+We can see that there's not much precipitation in Austin but also that without rain, the total inches is just 0 (excluding outliers). This factor is too obvious so I decided to remove it from our model.
+
+```{r}
+boxplot(as.numeric(aw$HumidityAvgPercent) ~ as.numeric(aw$Rain), xlab="Rain (1 = N, 2 = Y)", ylab="Average Humidity (%)", main="Humidity Depending on Rain")
+```
+
+With humidity, we can see the difference but also that there is overlap.
+
+```{r}
+boxplot(as.numeric(aw$VisibilityAvgMiles) ~ as.numeric(aw$Rain), xlab="Rain (1 = N, 2 = Y)", ylab="Average Visibility (miles)", main="Visibility Depending on Rain")
+```
+
+Visibility seems to be a good indicator for rain as well with a concentration at 10 without rain and lower with rain.
+
+```{r}
+plot_confusion_matrix(as_tibble(table(tibble('trgt' = aw$Rain, 'pred' = aw$Storm))),
+                      target_col = 'trgt',
+                      prediction_col = 'pred',
+                      counts_col = 'n',
+                      palette = 'Greens',
+                      add_counts = T,
+                      add_zero_shading = F,
+                      add_col_percentages = F,
+                      add_row_percentages = F,
+                      rm_zero_text = F)
+```
+
+Here, I used storm as the sole predictor for rain. The overall accuracy was 83% which is really good and shows the strong relationship between the two.
+
+### Testing default forest
+```{r}
+set.seed(49301)
+p <- predict(forest, testData, type="class")
+cm <- confusionMatrix(as.factor(p), as.factor(testData$Rain))
+cm$overall[1]
+plot_confusion_matrix(as_tibble(table(tibble('trgt' = testData$Rain, 'pred' = p))),
+                      target_col = 'trgt',
+                      prediction_col = 'pred',
+                      counts_col = 'n',
+                      palette = 'Greens',
+                      add_counts = T,
+                      add_zero_shading = F,
+                      add_col_percentages = F,
+                      add_row_percentages = F,
+                      rm_zero_text = F)
+
+```
+
+Here, I tested the random forest I created on the testing set and got ~84.47% accuracy. Most of the dataset is skewed towards no rain there's a lot of true negatives. 
+
+### Tuning mtry
+```{r}
+set.seed(49301)
+start <- Sys.time()
+tuned_model <- tuneRF(
+  x=trainData[,-14:-15],
+  y=trainData$Rain,
+  ntreeTry=500,
+  mtryStart = 3,
+  stepFactor = 1.5,
+  improve = 0.01,
+  trace = FALSE
+)
+end <- Sys.time()
+(time <- end - start) # time for tuning
+```
+
+I try to improve my model by tuning mtry, the number of different variables it looks at for partitioning for each decision tree.
+
+### Creating tuned forest
+```{r}
+set.seed(49301)
+tuned_forest <- randomForest(formula=Rain~.-PrecipitationSumInches, data=trainData, ntree=500, mtry=2)
+```
+
+### Testing tuned forest and showing results
+```{r}
+testData['Predictions'] <- predict(tuned_forest, testData)
+testData[11:35,-14]
+testData[11:35,15:16]
+# testData[90:100,]
+cm <- confusionMatrix(as.factor(testData$Predictions), as.factor(testData$Rain))
+# cm$overall[1]
+plot_confusion_matrix(as_tibble(table(tibble('trgt' = testData$Rain, 'pred' = testData$Predictions))),
+                      target_col = 'trgt',
+                      prediction_col = 'pred',
+                      counts_col = 'n',
+                      palette = 'Greens',
+                      add_counts = T,
+                      add_zero_shading = F,
+                      add_col_percentages = F,
+                      add_row_percentages = F,
+                      rm_zero_text = F)
+```
+
+The final accuracy of the tuned model on the testing set was 85.23%.
+
+```{r}
+# as.numeric(aw$Rain) - 1
+ra <- aggregate((as.numeric(Rain) - 1) ~ Year, aw, sum)
+colnames(ra)[2] <- "Rain"
+ra
+st <- aggregate((as.numeric(Storm) - 1) ~ Year, aw, sum)
+colnames(st)[2] <- "Storm"
+st
+sn <- aggregate((as.numeric(Snow) - 1) ~ Year, aw, sum)
+colnames(sn)[2] <- "Snow"
+sn
+fo <- aggregate((as.numeric(Fog) - 1) ~ Year, aw, sum)
+colnames(fo)[2] <- "Fog"
+fo
+```
+

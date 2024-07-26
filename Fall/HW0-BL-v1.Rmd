@@ -1,0 +1,24 @@
+---
+title: "First Rmd"
+author: "Eric Zhou"
+date: "2022-09-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Testing R Markdown
+### Creating set
+```{r}
+x <- sample(1:6, 200, replace=TRUE)
+x
+```
+
+### Mean and Graph
+```{r}
+mean(x)
+hist(x, ylab="count", xlab="value")
+```
+

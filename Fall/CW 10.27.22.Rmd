@@ -1,0 +1,33 @@
+---
+title: "CW 10.27.2022"
+author: "Eric Zhou"
+date: "2022-10-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+mcu <- read.csv("mcu_boxoffice.csv")
+head(mcu)
+```
+
+```{r}
+plot(x=mcu$Budget, y=mcu$RottenTomato)
+y1 = lm(mcu$RottenTomato~mcu$Budget)
+abline(y1)
+```
+
+```{r}
+plot(x=mcu$RottenTomato, y=mcu$TotalReceipts)
+y2 = lm(mcu$TotalReceipts~mcu$RottenTomato)
+abline(y2)
+cor(mcu$TotalReceipts, mcu$RottenTomato)
+```
+
+```{r}
+mcu$Film[mcu$Budget==max(mcu$Budget)]
+```
+

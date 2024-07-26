@@ -1,0 +1,192 @@
+---
+title: "Assignment 5"
+author: "Eric Zhou"
+date: "2022-11-2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# **Apprentice**
+## Problem 1
+```{r}
+data <- read.csv('WA-wildfires.csv')
+```
+
+#### **Part a**: 20 x 4 matrix. Rows are for the different fire seasons and columns are season, total_fires, acres_burned, and rainier_snow 
+```{r}
+dim(data)
+head(data)
+```
+
+#### **Part b**: All of the data is decently sporadic and scattered, correlation is not extremely high. Total fires and acres burned are generally going up while rainier snow is generally going down. The total number of fires jumps up and down frequently, it's mean is 1423.65 and the standard deviation is 284.1692. The acres burned does not have as much variation and remains relatively flat with a slight incline except for one giant spike in the middle. Its mean is 312764.8 and standard deviation is 285700.1. That is really high but I think it's because the mean is very low since that's where most of the data is and the giant spike went all the way to 800000 and caused the high standard deviation. Rainier snow levels also jump up and down, especially with 2 large dips downwards. The mean is 664.7 and standard deviation is 157.3873.
+```{r}
+plot(data$total_fires, type='l')
+abline(lm(data$total_fires ~ seq(1:length(data$total_fires))), col="cyan")
+plot(data$acres_burned, type='l')
+abline(lm(data$acres_burned ~ seq(1:length(data$acres_burned))), col="cyan")
+plot(data$rainier_snow, type='l')
+abline(lm(data$rainier_snow ~ seq(1:length(data$rainier_snow))), col="cyan")
+sd(data$total_fires)
+mean(data$total_fires)
+sd(data$acres_burned)
+mean(data$acres_burned)
+sd(data$rainier_snow)
+mean(data$rainier_snow)
+```
+
+#### **Part c**: There were `r sum(data$total_fires)` total fires and `r sum(data$acres_burned)` total acres burned 
+```{r}
+sum(data$total_fires)
+sum(data$acres_burned)
+```
+
+#### **Part d**: Mean is `r mean(data$rainier_snow)`, standard deviation is `r sd(data$rainier_snow)`, using mean +- 2 standard deviation (~95% of the data) so 349.9255 to 979.4745. The only season outside of those bounds is 2015
+```{r}
+snowmean <- mean(data$rainier_snow)
+snowdeviation <- sd(data$rainier_snow)
+snowmean
+snowdeviation
+lbound <- snowmean - 2 * snowdeviation
+rbound <- snowmean + 2 * snowdeviation
+lbound
+rbound
+data$season[data$rainier_snow < lbound | data$rainier_snow > rbound]
+```
+
+#### **Part e**: The distribution is definitely not normal, very skewed to the left. The frequency clearly decreases as the acres burned increases. For the likely range, I just chose mean +- standard deviation since that includes ~68% of the data assuming normal distribution.
+```{r}
+hist(data$acres_burned, breaks=5, xlim = c(0, 1200000), xlab="Acres Burned", main="Histogram of Acres Burned by Fires (2002 - 2021)")
+abline(v=mean(data$acres_burned) - sd(data$acres_burned), col="blue")
+abline(v=mean(data$acres_burned) + sd(data$acres_burned), col="blue")
+```
+
+#### **Part f**: There doesn't seem to be much of a pattern, not really trending positive or negative with just a blob of points in the center. It definitely does not look linear but I don't really think any other function would fit this either. Definitely a very weak correlation, the correlation is only about -0.02 so very close to 0. In the graph, the very left and right on the x-axis, or the extremes of snowfall, don't have many values and include values that are close to the mean but also ones that are relatively far. In the middle, other than the 1 outlier at the very bottom, it seems that the variance increases as snowfall increases. 
+```{r}
+plot(data$rainier_snow, data$total_fires, xlab="Snowfall at Rainier", ylab="Total Fires", main="Total Fires vs Snowfall at Rainier (2002 - 2021)")
+abline(lm(data$total_fires~data$rainier_snow))
+cor(data$total_fires, data$rainier_snow)
+```
+
+#### **Part g**: There were `r data$total_fires[data$season == 2004]` total fires in 2004
+```{r}
+data$total_fires[data$season == 2004]
+```
+
+#### **Part h**: 9 seasons had fewer
+```{r}
+sum(data$acres_burned < 200000)
+```
+
+#### **Part i**: 85% had more
+```{r}
+sum(data$total_fires > 1000)/length(data$total_fires)
+```
+
+<br>
+
+# **Master**
+## Problem 2
+#### **Part a**: Most fires was 2009, 2021, and 2018. Least snowfall was 2015, 2005, and 2020
+```{r}
+data[order(data$total_fires,decreasing=TRUE),]$season[1:3]
+data[order(data$rainier_snow),]$season[1:3]
+```
+
+#### **Part b**: The mean is 487168.8 acres, median is 293744.5 acres
+```{r}
+mean(data$acres_burned[data$rainier_snow < 600])
+median(data$acres_burned[data$rainier_snow < 600])
+```
+
+#### **Part c**: 1976 total fires
+```{r}
+max(data$total_fires[data$rainier_snow > mean(data$rainier_snow)])
+```
+
+#### **Part d**: Median is 698
+```{r}
+median(data$rainier_snow[data$total_fires > 1200])
+```
+
+#### **Part e**: Concentrated around 200 but there's a super high outlier and the upper whisker is a lot longer than lower.
+```{r}
+mean_acre <- data$acres_burned / data$total_fires
+mean_acre
+boxplot(mean_acre)
+```
+
+#### **Part f**: Acres burned has a correlation of around 0.41 and -0.58 for total fires and rainier snowfall respectively. You can definitely tell the trend and correlation in the graph and technically, snow has a stronger relationship because the absolute value of the correlation is higher so it is more indicative of the value. However, we can also definitely see that there is still a lot of variation and error in the linear model so that's why the absolute value o the correlation is still below 0.6, which is not very good for proportional relationships. I think that a positive relationship between acres burned and total fires definitely makes sense because more fires would most likley mean thatmore area was burned. The negative correlation between snow and acres burned also makes some sense since cold and rainy would mean snow but also less burning for fires.
+```{r}
+cor(data$acres_burned, data$total_fires)
+cor(data$acres_burned, data$rainier_snow)
+
+plot(data$total_fires, data$acres_burned, xlab="Total Fire Count", ylab="Acres Burned", main="Acres Burned vs Total Fire Count (2002 - 2021)")
+abline(lm(data$acres_burned ~ data$total_fires))
+
+plot(data$rainier_snow, data$acres_burned, xlab="Snowfall at Rainier", ylab="Acres Burned", main="Acres Burned vs Rainier Snowfall (2002 - 2021)")
+abline(lm(data$acres_burned ~ data$rainier_snow))
+```
+
+<br>
+
+# **Wizard**
+## Problem 3
+#### **Part a**: Yes, 2004, 2006, 2009, 2013, 2014, 2018, 2020, and 2021
+```{r}
+data$season[data$total_fires > 1400 & data$acres_burned < 1e6]
+```
+
+#### **Part b**: Yes, 2006, 2017, 2018, and 2021
+```{r}
+data$season[data$rainier_snow > 650 & data$acres_burned > 375000]
+```
+
+#### **Part c**: What is the mean inches of snowfall for seasons where average fire size was higher than 500? Answer is 398.
+```{r}
+mean(data$rainier_snow[mean_acre > 500])
+```
+
+#### **Part d**: Median snowfall is `r median(data$rainier_snow)`. There is a difference. When the snowfall was blow the median, the median acres burned of the 2 sets were fairly close but the upper 50% of the acres burned is way more spread out and way higher than the upper 50% of the acres burned where snowfall was above median
+```{r}
+data$above_med <- data$rainier_snow > median(data$rainier_snow)
+boxplot(data$acres_burned ~ data$above_med, xlab="Snowfall Above Median?", ylab="Acres Burned")
+```
+
+#### **Part e**: I ignored leap years and rounded to the closest day
+```{r}
+data$kc_aq <- c(NA, NA, NA, 0.696, 0.734, NA, 0.512, 0.745, 0.877, 0.866, 0.863, 0.605, 0.723, 0.584, 0.822, 0.729, 0.732, 0.767, 0.811, 0.841)
+mid_aq <- round((1 - data$kc_aq) * 365)
+mid_aq
+```
+
+#### **Part f**: From the correlation plot, it seems like the King County air quality, after getting rid of rows with NA, has a small positive correlation with total_fires, a small-medium negative correlation with the season (decreases over time), a small positive correlation with acres_burned, and a miniscule negative correlation with rainier_snow
+```{r}
+library(corrplot) #for correlation plots
+corrs <- cor(na.omit(data))
+corrplot(corrs, order = 'hclust', addrect = 2, )
+```
+
+```{r}
+data <- data[4:length(data$season),]
+plot(data$kc_aq, type='l')
+```
+
+```{r}
+cor(data$kc_aq, data$total_fires, use="complete.obs")
+cor(data$kc_aq, data$rainier_snow, use="complete.obs")
+cor(data$kc_aq, data$acres_burned, use="complete.obs")
+
+plot(data$total_fires, data$kc_aq, xlab="Total Fire Count", ylab="King County Air Quality", main="Air Quality vs Total Fire Count (2005 - 2021)")
+abline(lm(data$kc_aq ~ data$total_fires), col="cyan")
+
+plot(data$rainier_snow, data$kc_aq, xlab="Snowfall at Rainier", ylab="King County Air Quality", main="Air Quality vs Rainier Snowfall (2005 - 2021)")
+abline(lm(data$kc_aq ~ data$rainier_snow), col="cyan")
+
+plot(data$acres_burned, data$kc_aq, xlab="Acres Burned", ylab="King County Air Quality", main="Air Quality vs Acres Burned (2005 - 2021)")
+abline(lm(data$kc_aq ~ data$acres_burned), col="cyan")
+```
+

@@ -1,0 +1,42 @@
+---
+title: "Problem Set Template"
+author: "Eric Zhou"
+date: "2022-10-17"
+output: html_document
+---
+# https://bookdown.org/hneth/ds4psy/D-3-apx-colors-basics.html
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**: 
+#### **Part b**: 
+#### **Part c**: 
+#### **Part d**: 
+#### **Part e**: 
+<br>
+
+## **Problem 2**
+#### **Part a**: 
+#### **Part b**: 
+#### **Part c**: 
+#### **Part d**: 
+#### **Part e**: 
+<br>
+
+## **Problem 3**
+#### **Part a**: 
+#### **Part b**: 
+#### **Part c**: 
+#### **Part d**: 
+#### **Part e**: 
+<br>
+
+## **Problem 4**
+#### **Part a**: 
+#### **Part b**: 
+#### **Part c**: 
+#### **Part d**: 
+#### **Part e**: 

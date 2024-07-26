@@ -1,0 +1,107 @@
+---
+title: "Problem Set 13"
+author: "Eric Zhou"
+date: "2022-10-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+```{r}
+setwd("C:/Users/ezhou/OneDrive - Eastside Preparatory School/Documents/Eric/2022 - 2023/1 Fall/D Stats")
+sounders <- read.csv("sounders.csv")
+```
+
+#### **Part a**: Data is 34 x 8.  The 8 columns are 'Date', 'Opponent', 'Goals_For', 'Goals_Against', 'WDL', 'Home_Away', 'Attendance', and 'Possession'
+```{r}
+dim(sounders)
+head(sounders)
+```
+
+#### **Part b**: Put up 52 goals total
+```{r}
+sum(sounders$Goals_For)
+```
+
+#### **Part c**: Won 16 games
+```{r}
+length(which(sounders$Goals_For > sounders$Goals_Against))
+length(which(sounders$WDL == 'W'))
+```
+
+#### **Part d**: Mean is 1.529412, median is 1
+```{r}
+mean(sounders$Goals_For)
+median(sounders$Goals_For)
+```
+
+#### **Part e**: Mean is 29316.35, median is 31967.5. The difference between mean and medium can show the variance and so does the histogram. I would say median is a better estimate here because there's a lot of games around there and mean combines the outliers on both ends and ends up in the middle with no data values
+```{r}
+mean(sounders$Attendance)
+median(sounders$Attendance)
+hist(sounders$Attendance)
+```
+
+#### **Part f**: 
+```{r}
+quantile(sounders$Possession)
+```
+
+<br>
+
+## **Problem 2**
+#### **Part a**:Concentrated at the 0 - 1 and then decreases as the score increases
+```{r}
+hist(sounders$Goals_For, xlab='Goals Scored', main='Sounders Goals Scored', breaks=3)
+```
+
+#### **Part b**: There's a dip in the middle and then a dip at the end. Overall seems pretty random and jumps around a lot. Used lines to track pattern
+```{r}
+plot(x=sounders$Goals_For, type='l')
+```
+
+#### **Part c**: Spaced out, not a normal distribution. There's 2 higher ones and everything else is really infrequent
+```{r}
+hist(sounders$Attendance, xlab='Attendance', main='Sounders Games Attendance', breaks=10)
+```
+
+<br>
+
+## **Problem 3**
+#### **Part a**: 
+```{r}
+sounders[sounders$Attendance > 38000, ]
+```
+
+#### **Part b**: 
+```{r}
+sounders[sounders$WDL == 'D', ]
+```
+
+#### **Part c**: 
+```{r}
+sounders[sounders$Goals_For == 3 | sounders$Goals_For == 4, c('Date', 'Opponent')]
+```
+
+#### **Part d**: ~20.59% they were completely shut out
+```{r}
+length(sounders[sounders$Goals_For == 0,1])/length(sounders[,1])
+```
+
+<br>
+
+## **Problem 4**
+#### **Part a**: 
+```{r}
+goal_diff = sounders$Goals_For - sounders$Goals_Against
+goal_diff
+```
+
+#### **Part b**: They would get 56 points total
+```{r}
+length(which(sounders$WDL == 'W')) * 3 + length(which(sounders$WDL == 'D'))
+```
+

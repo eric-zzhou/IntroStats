@@ -1,0 +1,111 @@
+---
+title: "Problem Set 12"
+author: "Eric Zhou"
+date: "2022-10-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+```{r}
+temps <- c(71, 71, 69, 71, 69, 72, 71, 70, 70, 71, 82, 76, 74, 73, 74, 82, 82, 77, 80, 83, 83, 81, 72, 72, 71, 72, 72, 71, 72, 72, 73)
+```
+
+#### **Part a**: 5.5 degrees
+```{r}
+IQR(temps)
+```
+
+#### **Part b**: 71 to 76.5 degrees
+```{r}
+quantile(temps, c(0.25, 0.75))
+```
+
+#### **Part c**: IQR is the difference between the top and lower bound of the middle 50%
+#### **Part d**: Looks like there are no outliers
+```{r}
+boxplot(temps, ylab="Temperature per Year")
+```
+
+<br>
+
+## **Problem 2**
+```{r}
+section1 <- c(93, 89, 99, 95, 78, 81, 83, 94, 75, 98, 87, 94, 96, 94, 89)
+sort(section1)
+```
+
+#### **Part a**: 13.33%
+```{r}
+sum(section1 < 80)/length(section1)
+```
+
+#### **Part b**: 13.33%
+```{r}
+sum(section1 >= 98)/length(section1)
+```
+
+#### **Part c**: 20%
+```{r}
+sum(section1 == 94)/length(section1)
+```
+
+#### **Part d**: Student #8, #12, and #14
+```{r}
+studs = seq(1, length(section1))
+studs[section1 == 94]
+```
+
+#### **Part e**: 79.2
+```{r}
+quantile(section1, 0.1)
+```
+
+#### **Part f**: 93
+```{r}
+quantile(section1, 0.5)
+```
+
+<br>
+
+## **Problem 3**
+#### **Part a**: 
+```{r}
+hist(temps)
+abline(v=quantile(temps, 0.05), col='green')
+abline(v=quantile(temps, 0.95), col='green')
+```
+
+#### **Part b**: 
+```{r}
+hist(temps, xlim = c(65, 85))
+abline(v=quantile(temps, 0.05), col='green')
+abline(v=quantile(temps, 0.95), col='green')
+abline(v=mean(temps)-1.68*sd(temps), col='blue')
+abline(v=mean(temps)+1.68*sd(temps), col='blue')
+
+```
+
+#### **Part c**: Part a does since it actually uses what the 25% and 75% values of the scores are
+
+<br>
+
+## **Problem 4**
+```{r}
+enrollment <- c(6414, 1550, 2109, 9350, 21828, 4300, 5944, 5722, 2825, 2044, 5481, 5200, 5853, 2750, 10012, 6357, 27000, 9414, 7681, 3200, 17500, 9200, 7380, 18314, 6557, 13713, 17768, 7493, 2771, 2861, 1263, 7285, 28165, 5080, 11622)
+sort(enrollment)
+```
+
+#### **Part a**: There are outliers. They are 21828, 27000, and 28165
+```{r}
+boxplot(enrollment, ylab='Students Enrolled', main='Community College Enrollment')
+```
+
+#### **Part b**: I would want to accomodate the middle 50%, so 3750 to 9713 students. I think that makes sense since it's the middle half so not too little, not too much.
+```{r}
+quantile(enrollment, c(0.25, 0.75))
+```
+

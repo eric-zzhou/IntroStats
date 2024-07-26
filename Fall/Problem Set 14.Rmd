@@ -1,0 +1,108 @@
+---
+title: "Problem Set 14"
+author: "Eric Zhou"
+date: "2022-10-31"
+output: html_document
+---
+---
+title: "Problem Set Template"
+author: "Eric Zhou"
+date: "2022-10-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+```{r}
+setwd("C:/Users/ezhou/OneDrive - Eastside Preparatory School/Documents/Eric/2022 - 2023/1 Fall/D Stats")
+sounders <- read.csv("sounders.csv")
+head(sounders)
+```
+
+#### **Part a**: There were `r sum(sounders$Goals_Against[sounders$Home_Away == 'H'])` goals scored against sounders in home games
+```{r}
+sum(sounders$Goals_Against[sounders$Home_Away == 'H'])
+```
+
+#### **Part b**: 3 lowest attendance games were against Chicago, Montreal, and Columbus
+```{r}
+sorted_att <- sort(sounders$Attendance)
+sounders$Opponent[sounders$Attendance == sorted_att[1]]
+sounders$Opponent[sounders$Attendance == sorted_att[2]]
+sounders$Opponent[sounders$Attendance == sorted_att[3]]
+```
+
+#### **Part c**: Mean score on a tie is 1.125, median is 1
+```{r}
+mean(sounders$Goals_For[sounders$WDL == 'D'])
+median(sounders$Goals_For[sounders$WDL == 'D'])
+```
+
+#### **Part d**: Both the first half and the second half have exactly 8 wins
+```{r}
+half <- length(sounders$Date)/2
+first_half <- sounders[1:half,]
+second_half <- sounders[half+1:half,]
+length(first_half$Date[first_half$WDL == 'W'])
+length(second_half$Date[second_half$WDL == 'W'])
+```
+
+#### **Part e**: Mean possession time is `r mean(sounders$Possession[sounders$Goals_For >= 2])`, standard deviation is `r sd(sounders$Possession[sounders$Goals_For >= 2])` 
+```{r}
+poss <- sounders$Possession[sounders$Goals_For >= 2]
+mean(poss)
+sd(poss)
+```
+
+#### **Part f**: How much lower is the mean possession time for games that the sounders lost vs ones they won? The answer is 0.006575
+```{r}
+mean(sounders$Possession[sounders$WDL == 'W']) - mean(sounders$Possession[sounders$WDL == 'L'])
+```
+
+<br>
+
+## **Problem 2**
+#### **Part a**: Home game attendance is higher but also has a lot more outliers upwards. 
+```{r}
+boxplot(sounders$Attendance[sounders$Home_Away == 'H'])
+boxplot(sounders$Attendance[sounders$Home_Away == 'A'])
+```
+
+#### **Part b**: Not really, seems pretty sporadic.
+```{r}
+plot(sounders$Attendance[sounders$Home_Away == 'H'], sounders$Goals_For[sounders$Home_Away == 'H'], xlab='Attendance', ylab='Goals')
+```
+
+#### **Part c**: I looked at standard deviation. Wins and losses are around 0.08 while draws are at 0.13.
+```{r}
+sd(sounders$Possession[sounders$WDL == 'W'])
+sd(sounders$Possession[sounders$WDL == 'D'])
+sd(sounders$Possession[sounders$WDL == 'L'])
+```
+
+<br>
+
+## **Problem 3**
+#### **Part a**: Correlation is around positive 0.07 so super close to 0. Linear doesn't really work but I don't think anything else does either, looks really random. Variance is ~4.39 going either way.
+```{r}
+plot(USArrests$Murder, USArrests$UrbanPop)
+linm = lm(USArrests$UrbanPop ~ USArrests$Murder)
+abline(linm)
+cor(USArrests$UrbanPop, USArrests$Murder)
+var(USArrests$UrbanPop, USArrests$Murder)
+var(USArrests$Murder, USArrests$UrbanPop)
+```
+
+#### **Part b**: Correlation is positive ~0.8, which is pretty good. Linear function fits pretty well here. Variance is ~291 though but not sure what that means or if I'm doing it correctly.
+```{r}
+plot(USArrests$Murder, USArrests$Assault)
+linm2 = lm(USArrests$Assault ~ USArrests$Murder)
+abline(linm2)
+cor(USArrests$Assault, USArrests$Murder)
+var(USArrests$Assault, USArrests$Murder)
+var(USArrests$Murder, USArrests$Assault)
+```
+
