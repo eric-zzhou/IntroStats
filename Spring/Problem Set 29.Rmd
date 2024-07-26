@@ -1,0 +1,69 @@
+---
+title: "Problem Set 29"
+author: "Eric Zhou"
+date: "2023-03-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+```{r}
+emis <- c(14.0, 18.1, 15.3, 19.2, 16.5, 15.7, 16.5, 15.3, 13.8, 16.9, 16.1, 16.9, 12.8, 15.6, 15.2, 17.2, 16.0, 14.9, 16.0, 17.6, 16.1, 16.3, 17.8, 19.4, 18.2)
+```
+
+#### **Part a**: 
+```{r}
+1.8/5
+```
+
+#### **Part b**: 
+```{r}
+qnorm(0.025, mean(emis), 0.36)
+qnorm(0.975, mean(emis), 0.36)
+```
+
+<br>
+
+## **Problem 2**
+#### **Part a**: Yes since it's a rather large geographical region that is pretty diverse and includes various people. No since there might be some bias with the area like coastal or maybe the socioeconomic status of the people.
+#### **Part b**: Fail with p-value that is very small.
+```{r}
+2 * pnorm(mean(emis), 18, 0.36)
+```
+
+#### **Part c**: Seeing probability of test statistic vs scaling it and seeing the probability I think.
+```{r}
+(mean(emis)-18)/0.36
+```
+
+<br>
+
+## **Problem 3**: #2 is larger and they do not overlap.
+```{r}
+mean(emis) - 1.96 * 0.36
+mean(emis) + 1.96 * 0.36
+qnorm(0.025, 18, 0.36)
+qnorm(0.975, 18, 0.36)
+```
+
+<br>
+
+## **Problem 4**: 
+```{r}
+## Create storage for the simulated results
+x.bar <- c()
+## For loop to run 10000 trials
+for (i in 1:10000) {
+  a <- rweibull(18, 13, 200)  ## simulate the data
+  x.bar[i] <- mean(a)         ## calculate and store the sample mean
+}
+## plot a histogram of the distribution of x.bar
+hist(x.bar, main="Simulated values of x.bar", breaks=20)
+## what is the standard error (the standard deviation of x.bar)?
+sd(x.bar)
+sd(x.bar)/sqrt(18)
+```
+

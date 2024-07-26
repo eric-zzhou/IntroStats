@@ -1,0 +1,122 @@
+---
+title: "Assignment 17"
+author: "Eric Zhou"
+date: "2023-05-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Apprentice**
+
+## Problem 1
+
+#### **Part a**:
+
+|      |                                          |
+|:-----|:-----------------------------------------|
+| mpg  | Miles/(US) gallon                        |
+| cyl  | Number of cylinders                      |
+| disp | Displacement (cu.in.)                    |
+| hp   | Gross horsepower                         |
+| drat | Rear axle ratio                          |
+| wt   | Weight (1000 lbs)                        |
+| qsec | 1/4 mile time                            |
+| vs   | Engine (0 = V-shaped, 1 = straight)      |
+| am   | Transmission (0 = automatic, 1 = manual) |
+| gear | Number of forward gears                  |
+| carb | Number of carburetors                    |
+
+#### **Part b**: Already graphed all of the options and chose to regraph the best 5. Out of the 5, weight, horsepower, and displacement seem to have a decent negative correlation. Cylinders seem to be pretty decent as well even though it's categorical.
+
+```{r}
+plot(mpg~cyl, data=mtcars, main="MPG vs Cylinders", ylab="Miles Per Gallon", xlab="Cylinders")
+plot(mpg~hp, data=mtcars, main="MPG vs Horsepower", ylab="Miles Per Gallon", xlab="Horsepower")
+plot(mpg~disp, data=mtcars, main="MPG vs Displacement", ylab="Miles Per Gallon", xlab="Displacement")
+plot(mpg~drat, data=mtcars, main="MPG vs Rear Axle Ratio", ylab="Miles Per Gallon", xlab="Rear Axle Ratio")
+plot(mpg~wt, data=mtcars, main="MPG vs Weight", ylab="Miles Per Gallon", xlab="Weight")
+```
+
+#### **Part c**: Assuming alpha value of 0.05, all variables were significant except for rear axle ratio (drat). The intercept would mean the mpg of a car with 0 cylinders, 0 weight, and 0 for rear axle ratio. The cyl value of -1.51 would mean that for every additional cylinder, the mpg decreases by 1.51. For every extra 1000 lbs, the mpg decreases by 3.19. Finally, for every increase of 1 in rear axle ratio, the mpg decreases by 0.02.
+
+```{r}
+mpg.lm <- lm(mpg~cyl+wt+drat, data=mtcars)
+summary(mpg.lm)
+```
+
+#### **Part d**: Overall does have a pretty random spread concentrated between 12 and 25 mpg. There are some outliers on the far right where the residuals are really high so potentially the linear relationship no longer holds above an MPG of 32 or so or it could just be a coincidence since there's only 2 data points there.
+
+```{r}
+plot(mpg.lm$residuals~mtcars$mpg, main="Residuals vs MPG", xlab="MPG", ylab="Residuals")
+```
+
+#### **Part e**: R\^2 is around 0.83 which means that 83% of the variance in the original data is accounted for by the linear model.
+
+```{r}
+1-var(mpg.lm$residuals)/var(mtcars$mpg)
+```
+
+#### **Part f**: I'd say it's alright considering the high R\^2 but the outliers on the far right and the insignificance of why of the parameters should be taken into account. Testing a model without that parameter and getting more data on the higher bound would be beneficial to seeing the value of the model.
+
+#### **Part g**: Fit is 21.05 with 95% prediction range from 15.05 to 27.05.
+
+```{r}
+coefs <- unname(mpg.lm$coefficients)
+coefs
+coefs[1] + coefs[2] * 6 + coefs[3] * 3 + coefs[4] * 4.6
+newx <- data.frame(cyl=c(6), wt=c(3), drat=c(4.6))
+predict(mpg.lm, newx, interval="prediction")
+```
+
+<br>
+
+# **Master**
+
+## Problem 2
+
+#### **Part a**: All the p-values fell for intercept, cylinders, and weight, meaning each one became more significant. The overall R\^2 actually dropped a very tiny amount but the adjusted value went up by 0.06 which is a decent amount.
+
+```{r}
+mpg.lm2 <- lm(mpg~cyl+wt, data=mtcars)
+summary(mpg.lm2)
+1-var(mpg.lm2$residuals)/var(mtcars$mpg)
+```
+
+#### **Part b**: Compared to the first model (1c), this model's intercept and weight have more significance but the significance of cylinders has decreased a lot. Compared to the model above, the intercept is about the same significance, weight is slightly more significant, and cylinders are less significant. The R\^2 value and adjusted value are the highest of the 3.
+
+```{r}
+mpg.lm3 <- lm(mpg~cyl+wt+carb, data=mtcars)
+summary(mpg.lm3)
+```
+
+#### **Part c**: All the parameters became insignificant when everything was included. The multiple R\^2 value was the highest ever but the adjusted value is way lower than any previous value.
+
+```{r}
+mpg.lm4 <- lm(mpg~.-mpg, data=mtcars)
+summary(mpg.lm4)
+```
+
+## Problem 3
+
+#### **Part a**: Putting both into the model would be kind of repetitive because they have a linear correlation and then another slope is applied to both instead of just keeping one. Comparing all 3 models (disp only, cyl only, and both), disp only had the best R\^2 value and lowest residual standard error. This makes sense since cyl is categorical and disp is continuous so it might just be better to not repeat and have the flexibility of continuous input rather than a categorical one. 
+
+```{r}
+plot(mtcars$disp~mtcars$cyl, main="Displacement vs Cylinders", xlab="Cylinders", ylab="Displacement")
+cor(mtcars$disp, mtcars$cyl)
+mpg.lm5 <- lm(mpg~.-mpg-cyl, data=mtcars)
+summary(mpg.lm5)
+mpg.lm6 <- lm(mpg~.-mpg-disp, data=mtcars)
+summary(mpg.lm6)
+```
+
+#### **Part b**: It performed significantly better considering the adjusted R\^2 value increase from 0.8105 to 0.8196. Since the cyl variable has values of 4, 6, and 8, cyl6 and cyl8 are created to distinguish from cyl = 4 since the values are now categorical rather than continuous. This is what happens when you + to combine the different parameters so these 2 should the amount to increment by if cyl is 6 or 8 compared to when it is 4. This helps since when looking at the estimate values, rather than incrementing from 4 to 6 to 8, which would be optimal for a linear model, the increment from 4 cylinders to 6 is -1.21 and then 2.47 for cylinder 8.
+
+```{r}
+data <- mtcars
+data$cyl <- as.factor(data$cyl)
+unique(data$cyl)
+mpg.lm6 <- lm(mpg~.-mpg-disp, data=data)
+summary(mpg.lm6)
+```

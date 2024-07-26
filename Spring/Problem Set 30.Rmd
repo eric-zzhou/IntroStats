@@ -1,0 +1,73 @@
+---
+title: "Problem Set 30"
+author: "Eric Zhou"
+date: "2023-03-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+
+#### **Part a**: $H_0: p \geq 0.51$, $H_A: p<0.51$
+
+#### **Part b**:
+
+```{r}
+se <- sqrt(0.51*0.49/200)
+se
+
+x <- seq(from=0.51-3*se, to=0.51+3*se, by=0.001)
+y <- dnorm(x, 0.51, se)
+plot(x, y, type="l", xlab="bar X", ylab="probability")
+abline(v=qnorm(0.05, 0.51, se), col="red")
+```
+
+#### **Part c**: 0.45 would be slightly smaller than p-value.
+
+```{r}
+qnorm(0.05, 0.51, se)
+pnorm(0.45, 0.51, se)
+```
+
+<br>
+
+## **Problem 2**
+
+#### **Part a**: $H_0: \mu \leq 68$, $H_A: \mu>68$
+
+#### **Part b**:
+
+```{r}
+se <- 21/sqrt(100)
+se
+x <- seq(from=68-3*se, to=68+3*se, by=0.01)
+y <- dnorm(x, 68, se)
+plot(x, y, type="l", xlab="bar X", ylab="probability")
+abline(v=qnorm(0.9, 68, se), col="red")
+```
+
+#### **Part c**: Fail to reject null hypothesis
+
+```{r}
+qnorm(0.9, 68, se)
+pnorm(69.2, 68, se)
+```
+
+<br>
+
+## **Problem 3**
+
+#### **Part a**: Null would be true mean of drug value is greater than or equal to some value.
+
+#### **Part b**: Null would be proportion giving to charity is less than or equal to some value.
+
+#### **Part c**: Null would be stretching does not affect flexibility, not one-sided.
+
+#### **Part d**: Null would be true mean of sleep is greater than or equal to some value.
+
+<br>
+
+## **Problem 4: There was an extremely large effect in the opposite direction.**

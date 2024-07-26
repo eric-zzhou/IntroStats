@@ -1,0 +1,60 @@
+---
+title: "Problem Set 36"
+author: "Eric Zhou"
+date: "2023-05-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**: Yes
+#### **Part b**: 
+```{r}
+faithful.lm <- lm(faithful$waiting~faithful$eruptions)
+res <- faithful$waiting - faithful.lm$fitted
+res[1:10]
+faithful.lm$residuals[1:10]
+res-faithful.lm$residuals
+```
+
+#### **Part c**: Seems to be two clumps around x-values which is determined by data concentration.
+```{r}
+plot(faithful$eruptions,res)
+```
+
+#### **Part d**: Looks pretty good.
+```{r}
+hist(res)
+```
+
+<br>
+
+## **Problem 2**
+#### **Part a**: Actual data is the fitted data plus the residuals which is the error/offset
+#### **Part b**: The larger the sum of squared residuals, the poorer the fit.
+#### **Part c**: Shows how far off each prediction by the linear model is.
+<br>
+
+## **Problem 3**
+#### **Part a**: 
+```{r}
+10.7296/0.3148
+summary(faithful.lm)
+```
+
+#### **Part b**: Reject
+#### **Part c**: 
+```{r}
+10.7296 + qt(0.975, 270) * 0.3148
+10.7296 - qt(0.975, 270) * 0.3148
+```
+
+#### **Part d**: 
+```{r}
+1-var(faithful.lm$residuals)/var(faithful$waiting)
+cor(faithful$waiting,faithful$eruptions)^2
+```
+

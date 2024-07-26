@@ -1,0 +1,40 @@
+---
+title: "Problem Set 38"
+author: "Eric Zhou"
+date: "2023-05-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**: 
+```{r}
+library(car)
+dim(Salaries)
+head(Salaries)
+```
+
+#### **Part b**: Assuming same slope the professor has a way higher starting salary than associate professor.
+```{r}
+plot(salary~yrs.service, col=rank, data=Salaries)
+summary(lm(salary~yrs.service+rank, data=Salaries))
+```
+
+#### **Part c**: Intercepts based on rank
+#### **Part d**: Not the clearest. Although it provides more possible adjustments, the adjusted R^2 value is lower but R^2 value is higher.
+```{r}
+summary(lm(salary~yrs.service*rank, data=Salaries))
+```
+
+<br>
+
+## **Problem 2**: 
+```{r}
+model <- lm(salary~yrs.service+rank, data=Salaries)
+newx <- data.frame(yrs.service=c(6), rank=c("AsstProf"))
+predict(model, newx, interval="prediction")
+```
+

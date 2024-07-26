@@ -1,0 +1,126 @@
+---
+title: "Assignment 16"
+author: "Eric Zhou"
+date: "2023-05-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Apprentice**
+
+## Problem 1
+
+#### **Part a**:
+
+```{r}
+elmhurst <- read.csv("elmhurst.csv")
+plot(elmhurst$gift_aid~elmhurst$family_income, xlab="Family Income", ylab="Gift Aid", main="Aid vs Income at Elmhurst University", pch=3, col="blue")
+```
+
+#### **Part b**: Not the strongest of correlations but they are have a slight negative correlation.
+
+```{r}
+cor(elmhurst$family_income, elmhurst$gift_aid)
+```
+
+#### **Part c**: The relationship is generally negative over the entire range. The points are kind of all over the place but it looks like a linear model could fit decently. The linear correlation is not extremely strong but it's not very weak either. There is a decent bit of variation for y but it remains pretty consistent throughout the entire domain.
+
+<br>
+
+## Problem 2
+
+#### **Part a**: $\beta_0\approx24.319$ , $\beta_1\approx-0.043$. $\beta_0$ is the y-intercept which is predicted gift aid for a family with 0 income. $\beta_1$ is the slope which means that for every extra \$1000 the family earns, they would get around \$43 less in aid. The equation for the best fitting line is $y=\beta_1x+\beta_0\approx-0.043x+24.319$
+
+```{r}
+elm.lm <- lm(gift_aid~family_income, data=elmhurst)
+summary(elm.lm)
+```
+
+#### **Part b**:
+
+```{r}
+plot(elmhurst$gift_aid~elmhurst$family_income, xlab="Family Income", ylab="Gift Aid", main="Aid vs Income at Elmhurst University", pch=3, col="blue")
+abline(elm.lm, col="red", lty=2)
+```
+
+#### **Part c**: The slope of the line does represent the general trend in data and fits the average values pretty well. However, the data has way more variance than a linear model could account for so the residuals are large. Linear model is okay fit but not perfect.
+
+#### **Part d**: Around \$20,012.16.
+
+```{r}
+newx <- data.frame(family_income=c(100))
+predict(elm.lm, newdata=newx, interval="prediction")
+```
+
+<br>
+
+## Problem 3
+
+#### **Part a**: $H_0: \beta_1=0, H_A=\beta_1\neq0$
+
+#### **Part b**: Standard error is 0.01081 and test statistic is -3.985.
+
+```{r}
+summary(elm.lm)
+```
+
+#### **Part c**: p-value is around 0.0002286 which is way lower than our threshold, meaning that we reject our null hypothesis and show that the slope and correlation is significant and that there is a trend in the data.
+
+```{r}
+2*pt(-3.985, 48)
+```
+
+<br>
+
+# **Master**
+
+## Problem 4
+
+#### **Part a**:
+
+```{r}
+plot(elm.lm$residuals~elmhurst$family_income, xlab="Family Income", ylab="Residuals", main="Residuals vs Income")
+```
+
+#### **Part b**:
+
+```{r}
+hist(elm.lm$residuals, main="Residuals Distribution", freq=F, breaks=5, xlab="Residuals")
+```
+
+#### **Part c**: The residual distribution is a normal looking distribution that is centered around 0. Residuals do sum to almost 0. Residuals also do not really have a trend that depends on income.
+
+```{r}
+sum(elm.lm$residuals)
+```
+
+#### **Part d**: $R^2$ value is around 0.25 which means that the model accounts for around 25% of the variance in data but 75% of the variance is still unaccounted for.
+
+```{r}
+1-var(elm.lm$residuals)/var(elmhurst$gift_aid)
+cor(elmhurst$family_income, elmhurst$gift_aid)^2
+```
+
+#### **Part e**: I think that family income is a decent linear predictor of gift aid. Although it can't account for much of the variance, the relationship is statistically significant and the residuals follow all the assumptions for a good model.
+
+#### <br>
+
+## Problem 5
+
+#### **Part a**: \$75,000 is appropriate as it is within the range of data in the dataset that we built our model on. Since \$350,000 is well above the range and since we don't have data that show the trend continues, it is not best practice to apply this model for the prediction.
+
+```{r}
+range(elmhurst$family_income)
+```
+
+#### **Part b**: \$16,781.79. It is insufficient because our model is built on a sample which does not necessarily represent the entire dataset.
+
+```{r}
+newx <- data.frame(family_income=c(175))
+predict(elm.lm, newdata=newx, interval="prediction")
+```
+
+#### **Part c**: 95% confidence prediction ranges from \$6,940.53 to \$26,623.05.

@@ -1,0 +1,235 @@
+---
+title: "clean"
+output: html_document
+date: "2023-05-19"
+---
+```{r}
+library(tidyverse)
+library(caret) # regeression modelling 
+library(randomForest)
+library(plyr)
+library(ggthemes)
+library(scales)
+library(bst)
+library(mgcv)
+library(car)
+library(RColorBrewer)
+```
+
+```{r}
+cart <- read.csv("carsreal.csv")
+cart$engine_fuel[cart$engine_fuel=="gasoline"]<-"gas"
+
+cart <- cart |>
+  filter(!is.na(engine_capacity)) |>
+  filter(price_usd > 1000) |>
+  filter(price_usd < 10000)
+ca <- cart |>
+  summarize(
+    odometer = odometer_value,
+    year = year_produced,
+    disp = engine_capacity,
+    photo = number_of_photos,
+    days.listed = duration_listed,
+    color = color,
+    state = cart$state,
+    transmission = cart$transmission,
+    drive = cart$drivetrain,
+    fuel = cart$engine_fuel,
+    body = body_type,
+    make = manufacturer_name,
+    model = model_name,
+    price = price_usd
+  ) |>
+  arrange(desc(price)) |>
+  filter(year > 1990) |>
+  filter(odometer < 650000)
+
+nrow(ca)
+head(ca)
+```
+
+```{r}
+for (col in colnames(ca)){
+  print(col)
+  if (is.numeric(ca[[col]])){
+    print(summary(ca[[col]]))
+  } else {
+    print(length(unique(ca[[col]])))
+    print(head(unique(ca[[col]])))
+  }
+}
+```
+
+
+# Continuous Data
+```{r}
+# cors <- data.frame(col=character(), corr=double())
+# for (col in colnames(ca[c(1:9)])){
+#   cors <- cors |> add_row(col=col, corr=cor(ca$price, ca[[col]]))
+# }
+# cors |> arrange(desc(abs(corr)))
+
+# Continuous data
+data <- ca[1:5]
+for (col in colnames(data)){
+  plot(ca$price~ca[[col]], xlab="Price", ylab=col, main=paste("Price vs", col))
+}
+```
+
+
+```{r}
+ggplot(data=ca, mapping=aes(odometer, price))+
+    geom_jitter(aes(color=year))+
+    scale_color_gradient(low="lightblue",high="darkblue")+
+    labs(y = "Price ($USD)",
+         x = "Odometer (km)",
+         color = "Year",
+         title="Price vs Odometer") +
+    theme_bw() +
+    theme(legend.position="left")
+```
+
+
+```{r}
+ggplot(data=ca, mapping=aes(year, price))+
+    geom_jitter(aes(col=disp))+
+    scale_color_gradient(low="lightgreen",high="darkgreen")+
+    labs(y = "Price ($USD)",
+         x = "Year",
+         color = "Displacement (cm^3)",
+         title="Price vs Year") +
+    theme_bw()
+```
+
+```{r}
+ggplot(data=ca, mapping=aes(year, price))+
+    geom_jitter(aes(col=disp))+
+    scale_color_gradient(low="#FFFFFF",high="black")+
+    labs(y = "Price ($USD)",
+         x = "Year",
+         color = "Displacement (cm^3)") +
+    theme_bw()
+```
+
+
+# Categorical Data
+```{r}
+# violin plot
+data_cat <- ca[c(2, 4, 6:11)]
+for (col in colnames(data_cat)){
+  boxplot(ca$price~ca[[col]], ylab="Price", xlab=col, main=paste("Price vs", col))
+}
+```
+
+## boxplots: year, photo
+```{r}
+colfunc<-colorRampPalette(c("red","yellow","springgreen","royalblue"))
+boxplot(ca$price~ca$year, ylab="Price", xlab="Year", main="Price vs Year", col=colfunc(ca$year - 1990))
+goof <- ca$year - 1990
+emodel <- lm(ca$price~goof)
+abline(emodel,col="purple", lty=2, lwd=3)
+```
+
+```{r}
+colfunc<-colorRampPalette(c("red","yellow","springgreen","royalblue"))
+boxplot(ca$price~ca$photo, ylab="Price", xlab="Photo", main="Price vs Photos", col=colfunc(as.numeric(factor(ca$photo))))
+```
+
+
+## violinplots: state, transmission, drive
+```{r}
+ca2 <- ca |>  
+  group_by(state) |> 
+  dplyr::summarise(n=n(), avg = mean(price))
+
+ggplot(data=ca, mapping=aes(state, price))+
+    geom_violin(aes(fill=state))+
+    scale_fill_brewer(palette="Dark2")+
+    labs(y = "Price ($USD)",
+       x = "State",
+       color = "State",
+       title = "Price vs State") +
+    geom_jitter(col="grey", width=0.025, alpha=0.25)+
+    geom_text(data=ca2, aes(x=state, y=avg, label=n), color="blue", fontface=2, size=5)+
+    theme_bw() +
+    theme(legend.position="left")
+```
+
+```{r}
+ca2 <- ca |>  
+  group_by(transmission) |> 
+  dplyr::summarise(n=n(), avg = mean(price))
+
+ggplot(data=ca, mapping=aes(transmission, price))+
+    geom_violin(aes(fill=transmission))+
+    scale_fill_brewer(palette="Dark2")+
+    labs(y = "Price ($USD)",
+       x = "Transmission",
+       color = "Transmission",
+       title="Price vs Transmission") +
+    geom_text(data=ca2, aes(x=transmission, y=avg, label=n), color="blue", fontface=2, size=5)+
+    theme_bw()
+```
+
+
+```{r}
+ca2 <- ca |>  
+  group_by(drive) |> 
+  dplyr::summarise(n=n(), avg = mean(price))
+
+ggplot(data=ca, mapping=aes(drive, price))+
+    geom_violin(aes(fill=drive))+
+    scale_fill_brewer(palette="Dark2")+
+    labs(y = "Price ($USD)",
+       x = "Drive",
+       color = "Drive",
+       title="Price vs Drive") +
+    geom_text(data=ca2, aes(x=drive, y=avg, label=n), color="blue", fontface=2, size=5)+
+    theme_bw() +
+    theme(legend.position="left")
+```
+
+
+# Model Stuff
+
+```{r}
+model<-lm(price~.-body-disp,data=ca)
+```
+
+```{r}
+summary(model)
+```
+
+```{r}
+# plot(ca$price,model$residuals)
+# abline(h=0,col="blue",lwd=5)
+```
+
+```{r}
+ggplot(mapping=aes(ca$price,model$residuals))+
+  geom_jitter(aes(color=ca$year))+
+  scale_color_gradient(low="#FFFFFF",high="black")+
+  geom_abline(slope=0,col="red",lwd=2)+
+  labs(x = "Price ($USD)",
+       y = "Residuals ($USD)",
+       color = "Year") +
+  theme_bw() +
+  theme(legend.position="left")
+```
+
+```{r}
+pred <- predict(model, ca)
+# pred
+```
+
+```{r}
+plot(pred~ca$price, xlab="Actual", ylab="Prediction", main="Actual vs Predicted Car Price", pch=3)
+abline(a=0,b=1, col="red", lwd=5, lty=3)
+text(4500, 500, "actual = predicted", col="red")
+```
+
+```{r}
+sqrt(sum((pred-ca$price)^2)/length(pred))
+```
+

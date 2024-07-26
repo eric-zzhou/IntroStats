@@ -1,0 +1,40 @@
+---
+title: "Problem Set 39"
+author: "Eric Zhou"
+date: "2023-05-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**:
+```{r}
+library(car)
+salaries.lm <- lm(salary~., data=Salaries)
+```
+
+#### **Part b**: 
+```{r}
+summary(salaries.lm)
+```
+
+<br>
+
+## **Problem 2**: Adjusted R^2 value is a tiny bit lower but also certain values became less significant (years since phd and years of service).
+```{r}
+salaries.lm2 <- lm(salary~.-sex, data=Salaries)
+summary(salaries.lm2)
+```
+
+<br>
+
+## **Problem 3**
+```{r}
+newx <- data.frame(rank=c("AsstProf"), discipline=c("B"), yrs.since.phd=8, yrs.service=6, sex="Female")
+predict(salaries.lm, newx, interval="prediction")
+predict(salaries.lm2, newx, interval="prediction")
+```
+

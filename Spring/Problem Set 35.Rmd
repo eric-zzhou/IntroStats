@@ -1,0 +1,86 @@
+---
+title: "Problem Set 35"
+author: "Eric Zhou"
+date: "2023-04-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+```{r}
+x2 <- c(17.84, 14.44, 19.60, 11.02, 18.56, 10.41, 10.41, 14.76, 19.96, 13.58, 16.88, 17.23, 13.85, 12.50, 13.11, 12.01, 14.79, 17.78, 15.96, 18.88, 12.50, 13.89, 15.54, 15.95, 15.40)
+
+y2 <- c(20.30, 20.88, 27.15, 16.53, 27.78, 17.60, 14.58, 18.74, 31.31, 23.67, 25.98, 28.16, 20.29, 19.07, 20.64, 18.46, 21.93, 26.56, 29.27, 26.06, 15.72, 20.40, 23.74, 22.02, 21.55)
+```
+
+#### **Part a**: 
+```{r}
+plot(y2~x2)
+```
+
+#### **Part b**:
+```{r}
+cor(x2, y2)
+```
+
+#### **Part c**: 
+```{r}
+plot(y2~x2)
+abline(lm(y2~x2))
+```
+
+<br>
+
+## **Problem 2**
+```{r}
+ws <- c(62.3, 64.2, 64.4, 65.7, 66.5, 67.6, 68.1, 69.5, 69.8, 70.2, 70.1, 71.9, 74.2, 75.8, 77.1, 76.4, 75.5, 75.0, 74.4, 76.3, 76.5, 76.9, 76.4, 77.9, 79.4, 80.4, 81.0, 80.8, 80.2, 79.9, 80.2, 81.2, 82.2, 80.9, 82.1, 82.5, 81.1, 81.9, 81.8, 81.1)
+```
+
+#### **Part a**: 
+```{r}
+xs <- seq(1979, 2018)
+plot(ws~xs)
+```
+
+#### **Part b**: Strong positive correlation that's pretty linear.
+#### **Part c**: 
+```{r}
+cor(ws, xs)
+```
+
+#### **Part d**: 
+```{r}
+ws.lm <- lm(ws~xs)
+summary(ws.lm)
+```
+
+<br>
+
+## **Problem 3**
+#### **Part a**:
+```{r}
+plot(faithful$waiting~faithful$eruptions)
+```
+
+#### **Part b**: 
+```{r}
+plot(faithful$waiting~faithful$eruptions)
+abline(lm(faithful$waiting~faithful$eruptions))
+```
+
+#### **Part c**: 
+```{r}
+f.lm <- lm(faithful$waiting~faithful$eruptions)
+summary(f.lm)
+```
+
+#### **Part d**: No both have very low p-values.
+#### **Part e**: Range assuming you only have a sample.
+```{r}
+10.7296 + qt(0.975, 270) * 0.3148
+10.7296 - qt(0.975, 270) * 0.3148
+```
+

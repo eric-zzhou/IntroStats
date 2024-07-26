@@ -1,0 +1,162 @@
+---
+title: "Assignment 15"
+author: "Eric Zhou"
+date: "2023-04-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Master**
+
+## Problem 2
+
+#### **Part a**: 15 x 7 dataset (I removed the row w/ NA). Each row is a school, the columns are school name, district letter, student count, white student count, students of color count, percent of student body that are people of color, and the graduation rate.
+
+```{r}
+data <- read.csv("C:/Users/ezhou/OneDrive - Eastside Preparatory School/Documents/Eric/2022 - 2023/3 Spring/D Stats/redline_schools.csv")
+data <- na.omit(data)
+summary(data)
+head(data)
+```
+
+#### **Part b**: B district has very wide variance, C is very concentrated in high percentage, probably lacking in data points, and D is more distributed but with a way higher middle 50% than A and lower than B. There's also a None category.
+
+```{r}
+boxplot(Percent_POC ~ Letter, data=data, xlab="District", ylab = "PoC", main = "People of Color Percentage vs District")
+```
+
+#### **Part c**: B district has a very high graduation rate with almost no variation. C group is still lacking in variance and concentrated really low, still missing whiskers suggesting lack in datapoints. C is more varied and in between A and B. None still exists as a category with median close to C.
+
+```{r}
+boxplot(Grad_Rate ~ Letter, data=data, xlab="District", ylab = "Graduation Rate", main="Graduation vs  District")
+```
+
+#### **Part d**: Graduation rate seems to be consistently around 0.9 except for 4 extremely low values, 1 of which is at around 37% people of color and the others concentrated around 75% to 100% people of color.
+
+```{r}
+plot(data$Percent_POC, data$Grad_Rate, xlab="Students or People of Color (%)", ylab="Graduation Rate", main = "Graduation vs PoC")
+```
+
+#### **Part e**: $H_0: \mu_0=\mu_1=\mu_2$, $H_A:$ at least one of the means is different
+
+#### **Part f**: P-value is 0.0207 which is less than alpha of 0.05. We would reject the null hypothesis meaning that at least one of the graduation means is different between the redlined districts.
+
+```{r}
+summary(aov(Grad_Rate ~ Letter, data=data))
+```
+
+#### **Part g**: The p-value was pretty surprising as it was a lot higher than I expected looking at the boxplots. The median and boxes for the plots varied quite a bit and seemed quite different so a p-value of 0.02 was really high. This could be due to the difference in variance of the different categories where we have group D with really high variance and group B with really low. C and None groups are in between but also lean towards lower variance so it's quite all over the place.
+
+```{r}
+for (a in unique(data$Letter)){
+  print(a)
+  print(var(data$Grad_Rate[data$Letter == a], na.rm=T))
+}
+```
+
+#### **Part h**: Test statistic is around 0.004 which is below the adjusted alpha value of 0.008, meaning that there is strong evidence that graduation for B and C districts differ.
+
+```{r}
+summary(aov(Grad_Rate ~ Letter, data=data))
+diff <- mean(data$Grad_Rate[data$Letter=="B"], na.rm=T) - mean(data$Grad_Rate[data$Letter=="C"])
+sp2 <- 0.03266
+se <- sqrt(sp2/length(data$Grad_Rate[data$Letter=="B"]) + sp2/length(data$Grad_Rate[data$Letter=="C"]))
+se
+ts <- diff/se
+ts
+2*pt(ts, 11, lower.tail=F)
+0.05/6
+```
+
+<br>
+
+# **Wizard**
+
+## Problem 3
+
+#### **Part a**:
+
+```{r}
+## Simulate random data for 5 different groups, each from a Normal distribution 
+##  with slightly different means and standard deviations.  
+##  Using `round` to keep the numbers manageable
+A <- round(rnorm(20, 1, 2.5),2)
+B <- round(rnorm(20, 1.5, 2.5),2)
+C <- round(rnorm(20, 1.75, 2.5),2)
+D <- round(rnorm(20, 2, 2.5),2)
+E <- round(rnorm(20, 2.5, 2.5),2)
+## Combine all of this data
+data <- c(A, B, C, D, E)
+## Create the group designations
+groups <- c(rep("A", 20), rep("B", 20), rep("C", 20), rep("D", 20), rep("E", 20))
+## Put everything into a data.frame and label the columns
+my.dat <- data.frame(data, groups)
+colnames(my.dat) <- c("data", "groups")
+```
+
+#### **Part b**: Medians are pretty consistent and middle 50% are around the same level as well. There is quite a bit of variation in the size of middle 50% so that might be a problem.
+
+```{r}
+boxplot(data ~ groups, data=my.dat)
+```
+
+#### **Part c**: The p-value is 0.302, which is a lot higher than 0.05 so we would conclude that we fail to deny that the means are all the same.
+
+```{r}
+summary(aov(data ~ groups, data=my.dat))
+
+```
+
+#### **Part d**: We see a more upwards tilt across the groups instead of them being approximately flat. The variation still differs a bit across the categories as well.
+
+```{r}
+A <- round(rnorm(20, 1 - 0.125, 2.5),2)
+B <- round(rnorm(20, 1.5 - 0.1, 2.5),2)
+C <- round(rnorm(20, 1.75, 2.5),2)
+D <- round(rnorm(20, 2 + 0.1, 2.5),2)
+E <- round(rnorm(20, 2.5 + 0.125, 2.5),2)
+data <- c(A, B, C, D, E)
+groups <- c(rep("A", 20), rep("B", 20), rep("C", 20), rep("D", 20), rep("E", 20))
+my.dat <- data.frame(data, groups)
+colnames(my.dat) <- c("data", "groups")
+summary(aov(data ~ groups, data=my.dat))
+```
+
+```{r}
+boxplot(data ~ groups, data=my.dat)
+```
+
+#### **Part e**: Variance increases for both intergroup and intragroup but it seems to affect intergroup more, increasing by 6x as opposed to a bit more than 3x. The ratio between the intragroup and intergroup variances drops significantly and leads to a way higher p-value of 0.192.
+
+```{r}
+A <- round(rnorm(20, 1 - 0.125, 5),2)
+B <- round(rnorm(20, 1.5 - 0.1, 5),2)
+C <- round(rnorm(20, 1.75, 5),2)
+D <- round(rnorm(20, 2 + 0.1, 5),2)
+E <- round(rnorm(20, 2.5 + 0.125, 5),2)
+data <- c(A, B, C, D, E)
+groups <- c(rep("A", 20), rep("B", 20), rep("C", 20), rep("D", 20), rep("E", 20))
+my.dat <- data.frame(data, groups)
+colnames(my.dat) <- c("data", "groups")
+summary(aov(data ~ groups, data=my.dat))
+boxplot(data ~ groups, data=my.dat)
+```
+
+#### **Part f**: Causes drop in p-value as intragroup variation goes up by more than 3x and intergroup variation only goes up a bit more than 2x.
+
+```{r}
+A <- round(rnorm(20, 1 - 0.125, 2.5),2)
+B <- round(rnorm(20, 1.5 - 0.1, 2.5),2)
+C <- round(rnorm(20, 1.75, 2.5),2)
+D <- round(rnorm(20, 2 + 0.1, 2.5),2)
+E <- round(rnorm(20, 2.5 + 0.125, 10),2)
+data <- c(A, B, C, D, E)
+groups <- c(rep("A", 20), rep("B", 20), rep("C", 20), rep("D", 20), rep("E", 20))
+my.dat <- data.frame(data, groups)
+colnames(my.dat) <- c("data", "groups")
+summary(aov(data ~ groups, data=my.dat))
+boxplot(data ~ groups, data=my.dat)
+```

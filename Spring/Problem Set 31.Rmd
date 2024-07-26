@@ -1,0 +1,85 @@
+---
+title: "Problem Set 31"
+author: "Eric Zhou"
+date: "2023-03-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+
+#### **Part a**: $H_0:\mu=70, H_A:\mu\neq70$
+
+#### **Part b**: The null distribution would be a t-distribution with $df=11$ since we do not know the true standard deviation.
+
+#### **Part c**:
+
+```{r}
+x<-seq(from=-3.5,to=3.5, by=0.1)
+plot(x, dt(x, df=11), type="l", col="red", ylab="Probability", main="Null Distribution")
+```
+
+#### **Part d**: Test statistic is around -2.22
+
+```{r}
+se <- 2.5/sqrt(12)
+ts <- (68.4-70)/se
+ts
+x<-seq(from=-3.5,to=3.5, by=0.1)
+plot(x, dt(x, df=11), type="l", col="red", ylab="Probability", main="Null Distribution")
+abline(v=ts, col="blue")
+```
+
+#### **Part e**: The p-value is 0.048 which is less than 0.05 so we would reject the Null hypothesis. This means that the new variety is significantly worse than the previous.
+
+```{r}
+2 * pt(ts, 11)
+```
+
+<br>
+
+## **Problem 2:**
+
+#### **We would reject the null hypothesis meaning that there is a statistically significant decrease in the mean. This means the meditation did have a significant impact on anxiety levels.**
+
+```{r}
+anx <- c(14.5, 15.9, 17.2, 16.1, 22.2, 17.9, 18.4, 24.1, 18.9, 20.6)
+t.test(anx, alternative="two.sided", mu=20)
+
+se <- sd(anx)/sqrt(length(anx))
+ts <- (mean(anx)-20)/se
+se
+ts
+2 * pt(ts, length(anx)-1)
+```
+
+<br>
+
+## **Problem 3:**
+
+#### **90% confidence goes from around 16.85 to 20.31.**
+
+```{r}
+mean(anx) + qt(0.05, length(anx)-1) * se
+mean(anx) + qt(0.95, length(anx)-1) * se
+```
+
+<br>
+
+## **Problem 4:**
+
+#### **We would fail to reject the null hypothesis, meaning the difference in boot lifetimes is not statistically significant. Therefore, the new brand of boots are less expensive and probably lasts around the same time.**
+
+```{r}
+boot <- c(6.23, 16.10, 18.03, 15.05, 29.35, 21.20, 20.48, 14.80, 8.20, 24.39, 18.26, 17.29, 12.48, 9.69, 15.34, 6.58, 11.31, 15.16, 21.74, 18.71)
+t.test(boot, alternative="two.sided", mu=15)
+
+se <- sd(boot)/sqrt(length(boot))
+ts <- (mean(boot)-15)/se
+se
+ts
+2 * pt(ts, length(boot)-1, lower.tail = F)
+```

@@ -1,0 +1,104 @@
+---
+title: "Problem Set 32"
+author: "Eric Zhou"
+date: "2023-03-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Difference of Means
+
+<br>
+
+## **Problem 1**
+
+#### **Part a**: $H_0: \mu_1=\mu_2, H_A: \mu_1\neq\mu_2$. Fail to reject null hypothesis since p-score is higher than 0.05.
+
+```{r}
+pe <- 7.2 - 8.8
+pe
+se <- sqrt(1.35^2/6 + 2.46^2/5)
+se
+ts <- pe/se
+ts
+2 * pt(ts, 4)
+```
+
+#### **Part b**: Look at 95% confidence interval.
+
+```{r}
+pe + qt(0.025, 4) * se
+pe + qt(0.975, 4) * se
+```
+
+<br>
+
+## **Problem 2**
+
+```{r}
+Walnut_Park <- c(24.5, 12.6, 11, 13, 11.1, 19.1, 20.6, 16.8, 11.5, 16.2, 24.9, 19.9)
+Sunnyside <- c(10.5, 14.6, 13.8, 5.3, 7.6, 7.5, 10.3, 10.2, 6.4, 9.2, 22.1, 14.3)
+length(Walnut_Park)
+length(Sunnyside)
+mean(Walnut_Park)
+mean(Sunnyside)
+```
+
+#### **Part a**: Reject null hypothesis with p-value of only around 0.014.
+
+```{r}
+pe <- mean(Walnut_Park) - mean(Sunnyside)
+pe
+se <- sqrt(sd(Walnut_Park)^2/12 + sd(Sunnyside)^2/12)
+se
+ts <- pe/se
+ts
+2 * pt(ts, 11, lower.tail=F)
+t.test(Walnut_Park, Sunnyside)
+```
+
+#### **Part b**:
+
+```{r}
+pe + qt(0.05, 11) * se
+pe + qt(0.95, 11) * se
+```
+
+<br>
+
+# Paired Data
+
+<br>
+
+## **Problem 3:** $H_0: \mu_{diff}=0, H_A: \mu_{diff}\neq0$. Fail to reject null hypothesis since p-score is higher than 0.05.
+
+```{r}
+ts <- 2.18/11.45
+ts
+2 * pt(ts, 27, lower.tail=F)
+```
+
+<br>
+
+## **Problem 4: Reject cuz 0.05 \< 0.1 alpha value meaning there is a significant change.**
+
+```{r}
+before <- c(5, 12, 8, 5, 7, 5, 7, 4, 6, 5, 8, 11)
+after <- c(6, 7, 6, 3, 6, 4, 3, 8, 5, 4, 4, 9)
+length(before)
+```
+
+```{r}
+diffs <- before - after
+pe <- mean(diffs)
+pe
+se <- sd(diffs)/sqrt(12)
+se
+ts <- pe/se
+ts
+2 * pt(ts, 11, lower.tail = F)
+t.test(before, after, pair=T)
+```

@@ -1,0 +1,68 @@
+---
+title: "Problem Set 33"
+author: "Eric Zhou"
+date: "2023-03-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+
+#### **Part a**: $H_0:\mu_1=\mu_2=\mu_3=\mu_4, H_A:$ At least one mean is different
+
+#### **Part b**: 4 airlines, 100 samples?
+
+#### **Part c**: F-distribution
+
+#### **Part d**: 4.711
+
+#### **Part e**: 0.004, at least one mean is different.
+
+<br>
+
+## **Problem 2**
+
+#### **Part a**: Character for airline, number for time.
+
+```{r}
+data <- read.csv("C:/Users/ezhou/OneDrive - Eastside Preparatory School/Documents/Eric/2022 - 2023/3 Spring/D Stats/airdelays.csv")
+summary(data)
+```
+
+#### **Part b**: 5 airlines, 129 data entries.
+
+```{r}
+unique(data$airline)
+```
+
+#### **Part c**:
+
+```{r}
+boxplot(time~airline, data=data)
+```
+
+#### **Part d**: Aligns with boxplot very well.
+
+```{r}
+for (a in unique(data$airline)){
+  print(a)
+  print(mean(data$time[data$airline == a]))
+}
+```
+
+<br>
+
+## **Problem 3**
+
+#### **Part a**:
+
+```{r}
+summary(aov(time~airline, data=data))
+```
+
+#### **Part b**: Reject null hypothesis, at least one is different.
+
+#### **Part c**: H and Am but they are all kind of all over the place.
