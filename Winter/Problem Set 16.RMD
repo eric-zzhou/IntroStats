@@ -1,0 +1,132 @@
+---
+title: "Problem Set 16"
+author: "Eric Zhou"
+date: "2022-12-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+Outcome | Winnings ($) | Probability
+---|:-:|:-:
+number card | 0 | 0.69
+face card | 3 | 0.23
+Ace (no Spades) | 5 | 0.06
+Ace of Spades | 25 | 0.02
+
+#### **Part a**: (4, 1, 9, 529)
+```{r}
+winnings <- c(-2, 1, 3, 23)
+probs <- c(36/52, 12/52, 3/52, 1/52)
+winnings2 <- winnings ^ 2
+winnings2
+```
+
+#### **Part b**:
+```{r}
+ex2 <- sum(winnings2 * probs)
+ex2
+```
+
+#### **Part c**: 
+```{r}
+ex <- sum(winnings * probs)
+varia <- ex2 - (ex)^2
+varia
+```
+
+#### **Part d**: About 3.66 dollars
+```{r}
+sqrt(varia)
+```
+
+<br>
+
+## **Problem 2**
+#### **Part a**: The expected value is 7 and the variation is 5.8333
+```{r}
+probs <- c(1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1)/36
+values <- c(2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12)
+ex <- sum(values * probs)
+ex2 <- sum(values ^2 * probs)
+ex
+ex2 - (ex)^2
+```
+
+#### **Part b**: Average is 6.788 and variation is around  6.1
+```{r}
+rolls <- sample(values, replace=TRUE, prob=probs, 250)
+mean(rolls)
+var(rolls)
+```
+
+#### **Part c**: They are pretty close. 7 and 6.788 for expected value and 5.83 and 6.10 for variation.
+<br>
+
+## **Problem 3**
+```{r}
+winnings <- c(-2, 1, 3, 23)
+probs <- c(36/52, 12/52, 3/52, 1/52)
+winnings2 <- winnings ^ 2
+ex <- sum(winnings * probs)
+ex2 <- sum(winnings2 * probs)
+varia <- ex2 - (ex)^2
+```
+
+#### **Part a**: Expected overall winnings is $-26.92 and standard deviation is $25.89.
+```{r}
+oex <- 50 * ex
+osd <- sqrt(50 * varia)
+oex
+osd
+```
+
+#### **Part b**: The 95% likely range if from $-78.70 to $24.85.
+```{r}
+oex + 2 * osd
+oex - 2 * osd
+```
+
+#### **Part c**: Z-score of zero is around 1.04, meaning we are leaning towards losing money.
+```{r}
+-(oex)/osd
+```
+
+#### **Part d**: No because it is an overall loss and the 95% likely range is way more skewed towards the negatives. The z-score also suggests that I will probably lose money so I will not risk it.
+
+<br>
+
+## **Problem 4**
+```{r}
+net_earnings <- 0
+rounds <- 50
+tracking <- c()
+for (j in seq(1, rounds)) {
+  card <- sample(seq(1, 13), 1)
+  if (card == 1) {
+    if (sample(seq(1, 4), 1) == 1) {
+      net_earnings <- net_earnings + 23
+      tracking <- append(tracking, 23)
+      print(paste("Ace of Spades:", card, "| Net Earnings:", net_earnings))
+    } else {
+      net_earnings <- net_earnings + 3
+      tracking <- append(tracking, 3)
+      print(paste("Ace (not Spades):", card, "| Net Earnings:", net_earnings))
+    }
+  } else if (card >= 11) {
+    net_earnings <- net_earnings + 1
+    tracking <- append(tracking, 1)
+    print(paste("Face card:", card, "| Net Earnings:", net_earnings))
+  } else {
+    net_earnings <- net_earnings - 2
+    tracking <- append(tracking, -2)
+    print(paste("Number card:", card, "| Net Earnings:", net_earnings))
+  }
+}
+tracking
+paste("Overall expected value was", mean(tracking), "with variation of", var(tracking))
+```
+

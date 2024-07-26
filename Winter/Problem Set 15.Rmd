@@ -1,0 +1,104 @@
+---
+title: "Problem Set 15"
+author: "Eric Zhou"
+date: "2022-11-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**: Expected value is 4.5
+```{r}
+sum(seq(1, 8)/8)
+```
+
+#### **Part b**: 4.5 is not a value that can occur because it is not one of the sides of the die, which are whole numbers from 1 to 8 inclusive
+#### **Part c**: A list of the results of 1000 different rolls of a fair 8-sided die
+```{r}
+krolls <- sample(seq(1, 8), replace = TRUE, 1000)
+krolls
+```
+
+#### **Part d**: 
+```{r}
+barplot(table(krolls))
+abline(h=1000/8)
+```
+
+#### **Part e**: They are pretty close. tEh statistical average is 4.5 while the 1000 trials' average is 4.566
+```{r}
+sum(krolls)/1000
+```
+
+<br>
+
+## **Problem 2**
+#### **Part a**: 
+Outcome | Winnings ($) | Probability
+---|:-:|:-:
+number card | 0 | 0.69
+face card | 3 | 0.23
+Ace (no Spades) | 5 | 0.06
+Ace of Spades | 25 | 0.02
+
+#### **Part b**: Yes because all the cards together constitutes 52/52, which is 1.
+#### **Part c**: Expected value of winning is $1.49 per round.
+```{r}
+wins <- c(0, 3, 5, 25)
+chances <- c(0.69, 0.23, 0.06, 0.02)
+sum(wins * chances)
+```
+
+#### **Part d**: Yes because for a price of $2, you earn an average of $1.49 back per round, that's almost a 75% profit.
+
+<br>
+
+## **Problem 3**
+#### **Part a**: A is $120 net, B is -$50 net, and C is perfectly even
+```{r}
+(400 * 0.8 + 0 * 0.2) - 200
+(600 * 0.5 + 100 * 0.5) - 400
+(1500 * 0.25 + 500 * 0.75) - 750
+```
+
+#### **Part b**: I would choose A since it's the only expected value that profits
+#### **Part c**: What the companies do and whether that aligns with my values. Maybe my personal beliefs regarding the topic rather than relying purely on statistics.
+<br>
+
+## **Problem 4**
+#### **Part a**: 
+```{r}
+sample(seq(1, 13), 1)
+```
+
+#### **Part b**: 
+```{r}
+card <- sample(seq(1, 13), 1)
+if (card == 1) {
+  print(paste("Ace:", card))
+} else if (card >= 11) {
+  print(paste("Face card:", card))
+} else {
+  print(paste("Number card:", card))
+}
+```
+
+#### **Part c**: 
+```{r}
+card <- sample(seq(1, 13), 1)
+if (card == 1) {
+  if (sample(seq(1, 4), 1) == 1) {
+    print(paste("Ace of Spades:", card, "| Net Earnings:", 23))
+  } else {
+    print(paste("Ace (not Spades):", card, "| Net Earnings:", 3))
+  }
+} else if (card >= 11) {
+  print(paste("Face card:", card, "| Net Earnings:", 1))
+} else {
+  print(paste("Number card:", card, "| Net Earnings:", -2))
+}
+```
+

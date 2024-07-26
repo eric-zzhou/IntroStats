@@ -1,0 +1,173 @@
+---
+title: "Assignment 10"
+author: "Eric Zhou"
+date: "2023-01-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Apprentice**
+
+## Problem 1
+
+#### **Part a**: Assuming the teams that the Seahawks have played are pretty evenly distributed based on skill level and are similar to the teams that remain, I think it makes sense to use the proportion as an estimate for percentage of games they will win later.
+
+#### **Part b**: $n=8$ (games remaining), $k\approx5$ (number of games you expect to win)$, p=\frac{6}{9}=\frac{2}{3}$
+
+#### **Part c**: $P(Y=5): P(W)^5*P(!W)^3 * permutations$, 27.313%
+
+```{r}
+wins_prob <- c()
+for (win in 0:8){
+  permutation <- factorial(8)/factorial(8-8)/factorial(win)/factorial(8 - win)
+  wins_prob[win+1] <- (2/3)^win*(1/3)^(8-win)*permutation
+}
+wins_prob
+wins_prob[5+1]
+```
+
+#### **Part d**: $P(Y\ge5):P(Y=5)+P(Y=6)+...$
+
+```{r}
+sum(wins_prob[6:9])
+1-pbinom(5-1, 8, 6/9)
+```
+
+#### **Part e**: $P(Y\le2):P(Y=0)+P(Y=1)+P(Y=2)$
+
+```{r}
+sum(wins_prob[1:3])
+pbinom(2, 8, 6/9)
+```
+
+#### **Part f**: Expect about 5 wins with standard deviation of around 1 win. Middle 95% range goes from around 2.72 - 7.95.
+
+```{r}
+winmean <- 2/3*8
+winsd <- sqrt(8*2/3*1/3)
+winmean
+winsd
+winmean - 1.96 * winsd
+winmean + 1.96 * winsd
+```
+
+#### **Part g**: Normal looking distribution centered around 5.5.
+
+```{r}
+barplot(table(rbinom(10000, 8, 2/3))/10000, main="Win Distribution", xlab="# of wins", ylab="probability")
+abline(v=5.33 + 1)
+```
+
+<br>
+
+## Problem 2
+
+#### **Part a**: $H_0:p=0.5, H_A:p\neq0.5$
+
+#### **Part b**:
+
+```{r}
+x <- seq(from=37, to=85)
+y <- dbinom(x, 125, 0.5)
+barplot(y, names.arg=x, xlab="# of support", ylab="probability")
+```
+
+#### **Part c**:
+
+```{r}
+abound <- qbinom(0.025, 125, 0.5)
+bbound <- qbinom(0.975, 125, 0.5)
+abound
+bbound
+bp <- barplot(y, names.arg=x, xlab="# of support", ylab="probability")
+abline(v=bp[abound - 36], col="red")
+abline(v=bp[bbound - 36], col="red")
+```
+
+#### **Part d**: $\hat{p}=0.528$
+
+```{r}
+66/125
+```
+
+#### **Part e**: $p\approx0.592$
+
+```{r}
+2 * pbinom(65, 125, 0.5, lower.tail=FALSE)
+```
+
+#### **Part f**: I would fail to reject $H_0$ and conclude that there is a likely chance that there is not much of a preference regarding implementation of a gasoline tax.
+
+#### **Part g**: At least 73 people of the 125 have to say yes for the p value to drop below 0.05 and it stays below until the end.
+
+```{r}
+vals <- c()
+for (i in 0:125){
+  vals[i+1] <- 2 * pbinom(i, 125, 0.5, lower.tail=FALSE)
+}
+c(0:125)[vals < 0.05]
+2 * pbinom(73, 125, 0.5, lower.tail=FALSE)
+```
+
+<br>
+
+# **Master**
+
+## Problem 3
+
+#### **Part a**: Likely range goes from around 0.440 to around 0.616
+
+```{r}
+p_hat = 66/125
+se = sqrt(66/125 * 59/125 / 125)
+p_hat - 1.96 * se
+p_hat + 1.96 * se
+```
+
+#### **Part b**: It makes sense that it contains 0.5 since that would mean 0.5 is possible for the actual rate of approval in the entire population, aligning with what we found earlier using the null hypothesis and binom testing.
+
+#### **Part c**: 1.96 \* standard error is the margin of error, so 0.088 is the margin of error.
+
+```{r}
+1.96 * se
+```
+
+#### **Part d**: $1.96\times\sqrt{\frac{\hat{p}(1-\hat{p})}{n}}=ME_\hat{p}\rightarrow1.96^2\times\frac{0.528*0.472}{n}=0.015^2\rightarrow n=\frac{0.528*0.472*3.8416}{0.015^2}$. You would need at least 4255 people for a margin of error of 0.015 or better.
+
+```{r}
+r1 <- 66/125
+r2 <- 1-(66/125)
+r1*r2/(0.015^2)*(1.96)^2
+1.96*sqrt(r1*r2/4255)
+1.96*sqrt(r1*r2/4256)
+
+```
+
+## Problem 4
+
+#### $H_0: p_1=p_2, H_A:p_1\neq p_2$ where $p_1$ is proportion of people in 18 - 29 age group that believe government were tracking online activities and $p_2$ is proportion of people in age group 65+ that do.
+
+```{r}
+chisq.test(matrix(c(29, 14, 21, 34), 2, 2), correct = F)
+```
+
+#### Reject null hypothesis since p-value is below alpha value of 0.05 so we conclude that there most likely is a statistical difference between the age groups on whether they think gov tracks their online activities. Specifically, it seems that a larger proportion of 18 - 29 year olds believe the government is tracking their activities and a smaller proportion of 65+ people believe the same.
+
+# **Wizard**
+
+## Problem 5
+
+#### **Part a**: [Random data table](https://d2vlcm61l7u1fs.cloudfront.net/media%2F4dd%2F4dd3cc2f-8e7e-445a-80e8-4f291752c368%2FphpBtK2XL.png), $H_0:p_1=p_2, H_A: p_1\neq p_2$ where $p_1$ is the proportion of 11th graders with cell phones and $p_2$ is the proportion of 12th graders that do. Fail to reject null hypothesis since 0.467 is higher than alpha value of 0.05. We would conclude that the proportions are very similar and that the proportion of people with phones does not change much between the 11th and 12th grade.
+
+```{r}
+prop.test(c(59, 50), c(65, 53), correct=F)
+```
+
+#### **Part b**: We do get the same values for X-squared, degrees of freedom, and p-value. However, chi squared tests are used for looking at expected frequencies and seeing if the deviation is too large to be plausible while a test of proportions compares proportions between different groups to see how similar they are. Just for this test, test of proportions also includes more information including the 95% confidence rate, sample estimates, etc.
+
+```{r}
+chisq.test(matrix(c(59, 6, 50, 3), 2, 2), correct=F)
+```

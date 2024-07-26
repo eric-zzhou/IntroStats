@@ -1,0 +1,101 @@
+---
+title: "Problem Set 24"
+author: "Eric Zhou"
+date: "2023-01-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+
+#### **Part a**: $n=200, Y=120, \hat{p}=0.6$
+
+#### **Part b**:
+
+```{r}
+se <- sqrt(0.6*0.4/200)
+se
+```
+
+#### **Part c**:
+
+```{r}
+0.6 - 1.96 * se
+0.6 + 1.96 * se
+```
+
+#### **Part d**:
+
+```{r}
+1.96 * se
+```
+
+#### **Part e**:
+
+```{r}
+n2 <- 1/sqrt(0.025/sqrt(0.6*0.4))
+n2
+sqrt(0.6*0.4/n2)
+```
+
+<br>
+
+## **Problem 2**
+
+#### **Part a**: 95% of confidence intervals created this way will include true mean
+
+#### **Part b**: Standard deviation is distance of values from the mean, standard error is difference between sample p_hat and population actual p_hat
+
+#### **Part c**: Standard error decreases as population increases
+
+<br>
+
+## **Problem 3**
+
+#### **Part a**:
+
+```{r}
+sqrt(0.43*(1-0.43))/sqrt(600)
+```
+
+#### **Part b**:
+
+```{r}
+sqrt(0.43*(1-0.43))/sqrt(1200)
+```
+
+#### **Part c**: Divided by square root 2s
+
+```{r}
+sqrt(2)
+```
+
+#### **Part d**: 2400 cuz sqrt(4) = 2
+
+```{r}
+sqrt(0.43*(1-0.43))/sqrt(2400)
+```
+
+<br>
+
+## **Problem 4**
+
+#### **Part a**:
+
+```{r}
+se <- sqrt(0.51*0.49/600)
+0.51 - 1.64 * se
+0.51 + 1.64 * se
+```
+
+#### **Part b**:
+
+```{r}
+0.51 - 2.58 * se
+0.51 + 2.58 * se
+```
+
+#### **Part c**: Part b because it encompasses a larger percentage.

@@ -1,0 +1,119 @@
+---
+title: "Problem Set 19"
+author: "Eric Zhou"
+date: "2023-01-05"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**: Null hypothesis would be there is no difference and that every number should be the same. Observed test statistic is 7.58 which is only less than 1.89% of the null distribution, meaning that the null hypothesis is most likely wrong and we can reject the null hypothesis.
+```{r}
+choices <- c("R", "P", "S")
+exp <- rep(100/3, 3)
+
+n <- 10000
+rslt1 <- c()
+
+for (i in 1:n) {
+  sim <- sample(choices, 100, replace=TRUE)
+  
+  counts <- c()
+  for (choice in 1:length(choices)) {
+    counts[choice] <- sum(sim == choices[choice])
+  }
+  
+  rslt1[i] <- sum((counts - exp)^2/exp)
+}
+
+obs <- c(43, 21, 36)
+obs.ts <- sum((obs-exp)^2/exp)
+obs.ts
+hist(rslt1, main="RPS Null Distribution", xlab="value")
+abline(v=obs.ts, col="red")
+sum(rslt1>obs.ts)/length(rslt1)
+```
+
+<br>
+
+## **Problem 2**: Again, null hypothesis was be that the chance of each subject being the favorite is the same. Observed test statistic is 5.8 which is less than 21.19% of the total null distribution, meaning that although this value is somewhat unlikely, we would fail to reject the null hypothesis. It seems that there is a variety of interests although the probability may or may not be perfectly even.
+```{r}
+subjects <- c("art", "lit", "math", "sci", "ss")
+exp <- rep(10, 5)
+
+n <- 10000
+rslt2 <- c()
+
+for (i in 1:n) {
+  sim <- sample(subjects, 50, replace=TRUE)
+  
+  counts <- c()
+  for (subject in 1:length(subjects)) {
+    counts[subject] <- sum(sim == subjects[subject])
+  }
+  
+  rslt2[i] <- sum((counts - exp)^2/exp)
+}
+
+obs <- c(15, 12, 8, 5, 10)
+obs.ts <- sum((obs-exp)^2/exp)
+obs.ts
+hist(rslt2, main="Favorite Subject Null Distribution", xlab="value")
+abline(v=obs.ts, col="red")
+sum(rslt2>obs.ts)/length(rslt2)
+```
+
+<br>
+
+## **Problem 3**
+#### **Part a**: The null hypothesis would be that the chance of each thing being fished out should be exactly equivalent to the percent chances provided in the table. Observed test statistic is around 8.13 which is higher than 8.58% of the null distribution. Although this is highly unlikely, we still fail to reject the null hypothesis.
+```{r}
+choices <- c("cod", "salm", "fish", "treasure", "junk")
+exp <- c(0.51, 0.213, 0.127, 0.05, 0.1) * 56
+
+n <- 10000
+rslt3 <- c()
+
+for (i in 1:n) {
+  sim <- sample(choices, prob=exp, 56, replace=TRUE)
+  
+  counts <- c()
+  for (choice in 1:length(choices)) {
+    counts[choice] <- sum(sim == choices[choice])
+  }
+  
+  rslt3[i] <- sum((counts - exp)^2/exp)
+}
+
+obs <- c(21, 12, 13, 2, 8)
+obs.ts <- sum((obs-exp)^2/exp)
+obs.ts
+hist(rslt3, main="Fishing Null Distribution", xlab="value")
+abline(v=obs.ts, col="red")
+sum(rslt3>obs.ts)/length(rslt3)
+```
+
+#### **Part b**: Having 19, 14, 13, 2, and 8 for raw cod, raw salmon, other fish, treasure, and junk respectively gets an test statistic of around 9.69 which is only less than 4.75%
+```{r}
+test <- c(19, 14, 13, 2, 8)
+test.ts <- sum((test-exp)^2/exp)
+test.ts
+hist(rslt3, main="Fishing Null Distribution", xlab="value")
+abline(v=test.ts, col="red")
+sum(rslt3>test.ts)/length(rslt3)
+```
+
+<br>
+
+## **Problem 4**: The mean and 95th percentile of the 2 different null distributions are very close to one another. The difference in mean is around 0.009 and difference in 95th percentile is around 0.08. However, the favorite subject null distribution seems to vary a bit more and extends further but that may just be due to the random simulations.
+```{r}
+mean(rslt2)
+mean(rslt3)
+quantile(rslt2, 0.95)
+quantile(rslt3, 0.95)
+hist(rslt2, main="Favorite Subject Null Distribution", xlab="value")
+hist(rslt3, main="Fishing Null Distribution", xlab="value")
+```
+

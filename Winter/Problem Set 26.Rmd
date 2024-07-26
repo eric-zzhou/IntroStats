@@ -1,0 +1,90 @@
+---
+title: "Problem Set 26"
+author: "Eric Zhou"
+date: "2023-02-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+
+#### **Part a**: $a=3, b=8$
+
+#### **Part b**:
+
+```{r}
+(8+3)/2
+(8-3)^2/12
+sqrt((8-3)^2/12)
+```
+
+#### **Part c**: A very small amount because you care more about ranges.
+
+#### **Part d**:
+
+```{r}
+punif(5.42, 3, 8)
+```
+
+#### **Part e**:
+
+```{r}
+punif(7.21, 3, 8) - punif(3.48, 3, 8)
+```
+
+#### **Part f**: Matches really well
+
+```{r}
+thing <- runif(2000, 3, 8)
+var(thing)
+mean(thing)
+```
+
+<br>
+
+## **Problem 2**
+
+#### **Part a**: Areas of ranges times densities
+
+#### **Part b**: They are both uniform but one has values with decimals and includes all numbers while the other includes certain sets of numbers.
+
+#### **Part c**: Linearly increasing.
+
+<br>
+
+## **Problem 3**
+
+#### **Part a**:
+
+```{r}
+hist(runif(1000, 0, 1))
+```
+
+#### **Part b**:
+
+```{r}
+thing <- runif(1000, 0, 1)
+thing2 <- thing * 5 + 3
+mean(thing2)
+var(thing2)
+```
+
+#### **Part c**: \* 50
+
+#### **Part d**: Not sure what was wanted here
+
+```{r}
+qbinom(runif(1, 0, 1), 18, 1)
+```
+
+<br>
+
+## **Problem 4**
+
+```{r}
+(5-0)/(10-0)
+qunif(5/10, 0, 10)
+```

@@ -1,0 +1,99 @@
+---
+title: "Problem Set 20"
+author: "Eric Zhou"
+date: "2023-01-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**: Death rate is around 3.406% of the total population overall and applying to Italy returns 87.896 people.
+```{r}
+drate <- (79+2835)/(79+2835+2502+80151)
+drate
+drate * (79+2502)
+```
+
+#### **Part b**: The observed statistic is less than 28.7% of the simulations. This is not extreme enough and therefore we would fail to reject the null hypothesis.
+```{r}
+obs <- c(79, 2502, 2835, 80151)
+totC <- (2835 + 80151)
+totI <- (79 + 2502)
+totD <- (79 + 2835)
+totR <- (2502 + 80151)
+exp <- c(totD * totI, totR * totI, totD * totC, totR * totC) / sum(obs)
+obs.ts <- sum((obs-exp)^2/exp)
+
+draw.sample <- function() {
+  a <- sample(c(rep('D', totD), rep('R', totR)))
+  china <- a[1:totC]
+  italy <- a[(totC + 1):sum(obs)]
+  return (c(sum(italy=="D"), sum(italy=="R"), sum(china=="D"), sum(china=="R")))
+}
+
+nsims <- 1000
+rslt <- c()
+for (i in 1:nsims){
+  samp <- draw.sample()
+  rslt[i] <- sum((samp - exp)^2/exp)
+}
+
+hist(rslt)
+abline(v=obs.ts, col="red")
+sum(rslt>obs.ts)/length(rslt)
+```
+
+<br>
+
+## **Problem 2**
+#### **Part a**: For exact numbers, we would require 3 more values so that the rest can be filled in.
+#### **Part b**: That there is an independent relationship between grade level and dance attendance.
+#### **Part c**: Less than 88% of simulations. Not extreme enough to reject so we fail to reject based on my random numbers. 
+```{r}
+obs <- c(14, 11, 20, 14, 16, 12, 20, 20)
+tots <- c(25, 34, 28, 40)
+totG <- 70
+totN <- 57
+exp <- c(tots[1] * totG, tots[1] * totN, tots[2] * totG, tots[2] * totN, tots[3] * totG, tots[3] * totN, tots[4] * totG, tots[4] * totN) / sum(tots)
+obs.ts <- sum((obs-exp)^2/exp)
+obs.ts
+
+draw.sample <- function() {
+  a <- sample(c(rep('G', totG), rep('N', totN)))
+  fresh <- a[1:tots[1]]
+  soph <- a[(tots[1] + 1):sum(tots[1:2])]
+  jun <- a[(sum(tots[1:2]) + 1):sum(tots[1:3])]
+  sen <- a[(sum(tots[1:3]) + 1):sum(tots)]
+  return (c(sum(fresh=="G"), sum(fresh=="N"), sum(soph=="G"), sum(soph=="N"), sum(jun=="G"), sum(jun=="N"), sum(sen=="G"), sum(sen=="N")))
+}
+
+nsims <- 2500
+rslt <- c()
+for (i in 1:nsims){
+  samp <- draw.sample()
+  rslt[i] <- sum((samp - exp)^2/exp)
+}
+
+hist(rslt)
+abline(v=obs.ts, col="red")
+sum(rslt>obs.ts)/length(rslt)
+```
+
+<br>
+
+## **Problem 3**: The were both almost the exact same, with the test statstic matching the X-squared at 5.8 and the percentage/p-value being 0.2119 vs 0.2146 for the subject and matching 8.13 for X-squared/test statistic and p-value being 0.0858 vs 0.08681.
+```{r}
+chisq.test(c(15, 12, 8, 5, 10))
+chisq.test(c(21, 12, 13, 2, 8), p = c(0.51, 0.213, 0.127, 0.05, 0.1))
+```
+
+<br>
+
+## **Problem 4**: P-value was 0.88 vs 0.881. X-squared was around 0.6665 for both.
+```{r}
+chisq.test(data.frame(c(14, 20, 16, 20), c(11, 14, 12, 20)))
+```
+

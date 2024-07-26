@@ -1,0 +1,90 @@
+---
+title: "Problem Set 22"
+author: "Eric Zhou"
+date: "2023-01-19"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**: Expect 21.25, sd of around 1.79
+```{r}
+0.85 * 25
+sqrt(25*0.85*0.15)
+```
+
+#### **Part b**: n = 25, k = 18+, p = 0.85
+```{r}
+1 - pbinom(18 - 1, 25, 0.85)
+```
+
+#### **Part c**: 
+```{r}
+pbinom(18, 25, 0.85)
+```
+
+#### **Part d**: No, because x = 18 is repeated in both.
+#### **Part e**: Between 17.75 and 24.75 which aligns well with the 18 earlier.
+```{r}
+0.85 * 25 + 1.96 * sqrt(25*0.85*0.15)
+0.85 * 25 - 1.96 * sqrt(25*0.85*0.15)
+```
+
+<br>
+
+## **Problem 2**
+#### **Part a**: 
+```{r}
+dbinom(10, 10, 94/117)
+1 - pbinom(9, 10, 94/117)
+```
+
+#### **Part b**: 
+```{r}
+pbinom(3, 5, 94/117)
+```
+
+#### **Part c**: 
+```{r}
+1 - pbinom(4 - 1, 5, 94/117)
+```
+
+#### **Part d**: 
+```{r}
+1 - pbinom(8, 10, 94/117)
+```
+
+#### **Part e**: I assume so but in real life probably not since skill level would affect each player and team's success rate.
+#### **Part f**: 95% likely range.
+```{r}
+10 * 94 / 117 + 1.96 * sqrt(10 * 94 / 117 * 23 / 117)
+10 * 94 / 117 - 1.96 * sqrt(10 * 94 / 117 * 23 / 117)
+```
+
+#### **Part g**: 
+```{r}
+probs <- dbinom(0:5, 5, 94/117)
+probs
+sum(probs ^ 2)
+```
+
+<br>
+
+## **Problem 3**
+#### **Part a**: 
+```{r}
+probs <- pbinom(0:25, 25, 0.85)
+probs
+```
+
+#### **Part b**: 
+```{r}
+plot(probs, type="s")
+```
+
+#### **Part c**: Adds cumulative probabilities at each step.
+#### **Part d**: Both are at 23, makes sense since it adds enough to include both thresholds
+

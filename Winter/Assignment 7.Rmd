@@ -1,0 +1,153 @@
+---
+title: "Assignment 7"
+author: "Eric Zhou"
+date: "2022-12-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# **Apprentice**
+## Problem 1
+#### **Part a**: Random variable would be the result of the 2 die.
+```{r}
+sum(sample(1:4, 1), sample(1:4, 1))
+```
+
+#### **Part b**: Total chance of winning $4 is 7/16, getting money back is 1/4, and losing $5 is 5/16.
+Sum | Probability | Outcome
+:-:|:-:|:-:
+2 | 1/16 | 0
+3 | 2/16 | -5
+4 | 3/16 | -5
+5 | 4/16 | 4
+6 | 3/16 | 4
+7 | 2/16 | 0
+8 | 1/16 | 0
+
+#### **Part c**: E[X] is 0.1875.
+```{r}
+out <- c(0, -5, -5, 4, 4, 0, 0)
+probs <- c(1/16, 2/16, 3/16, 4/16, 3/16, 2/16, 1/16)
+ex <- sum(out * probs)
+ex
+```
+
+#### **Part d**: Variance and standard deviation for one round of this game is approximately 14.78 and 3.84 respectively.
+```{r}
+varx <- sum(out^2*probs) - (ex)^2
+varx
+sqrt(varx)
+```
+
+#### **Part e**: 120 rounds would have expected winnings of $22.5 with a standard deviation of $42.11
+```{r}
+mulex <- ex * 120
+mulsd <- sqrt(120 * varx)
+mulex
+mulsd
+```
+
+#### **Part f**: 95% likely range for 120 rounds is from -$61.72 to 106.72
+```{r}
+mulex + 2 * mulsd
+mulex - 2 * mulsd
+```
+
+#### **Part g**: I would since the game is skewed to the positive so the chance of winning money is higher than that of losing money.
+<br>
+
+# **Master**
+## Problem 2
+#### **Part a**: Around $3.57
+```{r}
+out2 <- c(0, -5, -5, 0, 0)
+probs2 <- c(1/16, 2/16, 3/16, 2/16, 1/16)
+-sum(out2 * probs2)/(7/16)
+```
+
+#### **Part b**: Z-score of 0 is -0.53, meaning that the chance of losing money is quite a bit lower than even and that 69.1% of the distribution is above 0. This is a lot lower than the z-score for a single round and that makes sense because the chance of earning money is higher so as you do more, you should theoretically earn more.
+```{r}
+(0-mulex)/mulsd
+(0-ex)/sqrt(varx)
+```
+
+#### **Part c**: Risk prone is willing to take risks to gain money, risk neutral is where risk is not considered while gaining money, risk averse is to avoid risks. I think this I would classify myself as between risk neutral and risk averse but leaning towards averse since I chose to play the game only because the expected value is positive and the z-score of zero leans towards not losing money. However, there's obviously still a chance to lose money so I am not weighting that as heavily.
+#### **Part d**: This simulation of 500 rounds averaged $0.166 of earnings per round and had a standard deviation of around $3.85, which is decently close to the $0.1875 and $3.84.
+```{r}
+earnings <- c()
+for (j in 1:500){
+  roll <- sum(sample(1:4, 1), sample(1:4, 1))
+  earnings[j] <- out[roll - 1]
+}
+mean(earnings)
+sd(earnings)
+``
+<br>
+
+## Problem 3
+#### **Part a**: Maximum earnings is $700, minimum is -$80
+```{r}
+60 * 15 - 200
+8 * 15 - 200
+```
+
+#### **Part b**: Expected value for number of people is 35 and expected profit for the fundraiser is $325.
+```{r}
+expeep <- sum(60 * 0.45 + 20 * 0.3 + 8 * 0.25)
+expeep
+expeep * 15 - 200
+```
+
+#### **Part c**: I would say no because although the expected value is positive, the fundraiser is only going to occur once so you can't benefit from doing multiple rounds. Furthermore, there's a 25% chance that you do work and lose money which seems pretty sad. I would try to do a different fundraiser that guarantees no losses. 
+<br>
+
+# **Wizard**
+## Problem 4
+#### The simulation had average earnings of $22.62 with a standard deviation of around $41.28. This closely aligns with the values calculated earlier which was an expected value of $22.5 with a standard deviation of $42.11.
+```{r}
+earnings <- c()
+for (j in 1:500) {
+  rolls <- sample(1:4, 120, replace=TRUE) + sample(1:4, 120, replace=TRUE)
+  earnings[j] <- sum(out[rolls - 1])
+}
+mean(earnings)
+sd(earnings)
+```
+
+<br>
+
+## Problem 5
+#### **Part a**: Expected value for loaves sold is 3.05 with an expected earning of $14.49.
+```{r}
+loafprobs <- c(0.05, 0.15, 0.2, 0.2, 0.2, 0.1, 0.1)
+exloaf <- sum(0:6 * loafprobs)
+exloaf
+exloaf * 4.75
+```
+
+#### **Part b**: Standard deviation for revenue is around $7.87.
+```{r}
+sqrt(sum((0:6)^2 * loafprobs) - (exloaf)^2) * 4.75
+```
+
+#### **Part c**: 
+```{r}
+sum(c(0, 1, 2, 3, 4, 5, 5) * loafprobs) * 4.75 - 5 * 1.75
+```
+
+#### **Part d**: 4 loaves has the highest expected profit.
+```{r}
+for (j in 0:6) {
+  bread <- c(0:6)
+  for (v in seq(length(bread))) {
+    bread[v] = min(v - 1, j)
+  }
+  print(sum(bread * loafprobs) * 4.75 - j * 1.75)
+}
+```
+
+#### **Part e**: Size of the oven and if you could store the loaves for later since then it ight be more efficient just to bake more. Also, maybe bulk buying ingredients.

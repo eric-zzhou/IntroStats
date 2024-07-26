@@ -1,0 +1,148 @@
+---
+title: "Problem Set 27"
+author: "Eric Zhou"
+date: "2023-02-07"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+
+#### **Part a**: Variance is \$\\sigma\^2\$, mean is $\mu$
+
+#### **Part b**:
+
+```{r}
+x <- seq(-3, 3, by=0.01)
+y <- dnorm(x)
+plot(x, y, type="l")
+```
+
+#### **Part c**: Around 95%
+
+```{r}
+pnorm(2) - pnorm(-2)
+pnorm(-0.75, lower.tail=TRUE)
+pnorm(1.2, lower.tail=TRUE)
+pnorm(1.2, lower.tail=FALSE)
+pnorm(1.2, lower.tail=T) - pnorm(-0.75, lower.tail=T)
+```
+
+#### **Part d**:
+
+```{r}
+x <- seq(-5, 5, by=0.01)
+y <- dnorm(x)
+plot(x, y, type="l", ylim=c(0, 1))
+lines(x, dnorm(x, 0, 1.5), col="blue")
+lines(x, dnorm(x, 0, 0.5), col="red")
+```
+
+#### **Part e**: Adjusts the spread of distribution
+
+<br>
+
+## **Problem 2**
+
+#### **Part a**: $\mu=10, \sigma^2=6.25, \sigma=2.5$
+
+#### **Part b**:
+
+```{r}
+mu <- 10
+sigma <- 2.5
+nums <- rnorm(250, mu, sigma)
+mean(nums)
+sd(nums)
+var(nums)
+
+```
+
+#### **Part c**:
+
+```{r}
+x <- seq(mu - 3 * sigma, mu + 3 * sigma, by=0.01)
+hist(nums, freq=F)
+lines(x, dnorm(x, mu, sigma), type="l", col="red")
+```
+
+#### **Part d**:
+
+```{r}
+pnorm(9.9, mu, sigma)
+hist(nums, freq=F)
+lines(x, dnorm(x, mu, sigma), type="l", col="red")
+abline(v=9.9, col="blue")
+```
+
+#### **Part e**:
+
+```{r}
+pnorm(12.4, mu, sigma, lower.tail=F)
+
+```
+
+#### **Part f**:
+
+```{r}
+pnorm(20, mu, sigma) - pnorm(18, mu, sigma)
+pnorm(18, mu, sigma) + pnorm(20, mu, sigma, lower.tail=F)
+```
+
+#### **Part g**:
+
+```{r}
+qnorm(0.6, mu, sigma)
+pnorm(10.63337, mu, sigma)
+```
+
+#### **Part h**:
+
+```{r}
+qnorm(0.125, mu, sigma)
+qnorm(0.125 + 0.75, mu, sigma)
+```
+
+<br>
+
+## **Problem 3**
+
+```{r}
+plot(x, pnorm(x, mu, sigma), type="s")
+```
+
+<br>
+
+## **Problem 4**
+
+```{r}
+## Create the base standard Normal density plot
+x <- seq(from=-3, to=3, by=0.02)
+y <- dnorm(x)
+plot(x,y,type="l")
+
+## Create the x values that define the polygon.  
+## Note that I both start at -2 and end at -2, which is doubled up to close the polygon.
+x1 <- c(-2, -1, seq(from=-1, to=-2, by=-0.02), -2)
+## Now create the corresponding y values that define the polygon.
+y1 <- c(0, 0, dnorm(seq(from=-1, to=-2, by=-0.02)), 0)
+## Call polygon with the color of choice. Make sure x1 and y1 are the same length!
+polygon(x1, y1, col="cadetblue1")
+```
+
+#### **Part a**:
+
+```{r}
+## Create the base standard Normal density plot
+x <- seq(from=-3, to=3, by=0.02)
+y <- dnorm(x)
+plot(x,y,type="l")
+
+x1 <- c(-1.5, 1.5, seq(from=1.5, to=-1.5, by=-0.02), -1.5)
+y1 <- c(0, 0, dnorm(seq(from=1.5, to=-1.5, by=-0.02)), 0)
+
+polygon(x1, y1, col="cadetblue1")
+```

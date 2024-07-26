@@ -1,0 +1,43 @@
+---
+title: "Problem Set 25"
+author: "Eric Zhou"
+date: "2023-01-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**: Estimate for true difference in proportions so difference is 28% of people.
+```{r}
+6/20 - 11/19
+```
+
+#### **Part b**: H_0: p1 = p2, H_A : p1 != p2, fail to reject H_0
+```{r}
+prop.test(c(14, 8), c(20, 19), correct=F)
+```
+
+#### **Part c**: 0.158859
+```{r}
+p <- 22/39
+sqrt(p * (1-p) * (1/20 + 1/19))
+```
+
+#### **Part d**: Although we fail to reject and they should be identically distributed, it does not look to be that way. Independence is the same.
+```{r}
+barplot(matrix(c(6, 14, 11, 8),nr=2), beside=T, col=c("aquamarine3","coral"), 
+        names.arg=c("Latin", "No Latin"), ylim=c(0, 15))
+legend("topleft", c("<= 100","> 100"), pch=15,  col=c("aquamarine3","coral"), 
+       bty="n")
+```
+
+#### **Part e**: -0.02 to 0.58. Does include 0 meaning it is a possible difference between the 2 so we would fail to reject.
+
+<br>
+
+## **Problem 2**
+#### **Part a**: No, p-value is around 0.1.
+#### **Part b**: Contains 0 so we would fail to reject as it is a possibility in the 95% range.

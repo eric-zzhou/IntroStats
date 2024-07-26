@@ -1,0 +1,176 @@
+---
+title: "Data Exploration"
+author: "Eric Zhou"
+date: "2023-02-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Basic Exploration and Cleaning
+## Importing Library and Data
+```{r}
+library(readxl)
+library(tidyverse)
+```
+
+```{r}
+# http://shiny.madeateps.org/statistics/lab9.3/#section-summary
+data <- read_excel("C:\\Users\\ezhou\\OneDrive - Eastside Preparatory School\\Documents\\Eric\\2022 - 2023\\2 Winter\\D Stats\\Shoe Preference Data.xlsx")
+data
+```
+
+## Data Cleaning
+```{r}
+data <- data[-c(1:5)]
+colnames(data) = c("Grade", "Gender", "Region", "Sports", "Fav", "Own")
+data
+```
+
+## Reorganizing Data
+```{r}
+brands <- c("Adidas", "Jordan", "New Balance", "Nike", "Other", "Sketchers")
+market_share <- c(0.114, 0.157,  0.035,         0.356,  0.291,   0.047)
+fav_counts <- table(data$Fav)
+own_counts <- table(data$Own)
+# for (j in 1:length(brands)){
+#   fav_counts[j] <- length(data$Fav[data$Fav == brands[j]])
+#   own_counts[j] <- length(data$Own[data$Own == brands[j]])
+# }
+fav_counts
+own_counts
+```
+
+# Goodness of Fit with Market Share
+## Expected value
+```{r}
+exp <- market_share * sum(fav_counts)
+exp
+fav_counts
+own_counts
+```
+
+## Graphing
+```{r}
+fav_df <- as.data.frame(table(data$Fav))
+fav_df$Type = 'Favorite'
+own_df <- as.data.frame(table(data$Own))
+own_df$Type = 'Own'
+exp_df <- as.data.frame(table(data$Own))
+exp_df$Freq <- exp
+exp_df$Type = 'Expected'
+brand_data <- rbind(own_df, fav_df, exp_df)
+colnames(brand_data) <- c("Brand", "Count", "Type")
+brand_data
+```
+
+```{r}
+ggplot(data=brand_data, aes(x=fct_reorder(Brand, Count, max, .desc=TRUE),
+                            y=Count, fill=Type)) +
+  geom_bar(stat="identity", position="dodge") +
+  xlab("Brand") +
+  ggtitle("Shoe Brand Data") +
+  scale_fill_manual('Type', values=c('#363635', '#53CA79', '#A09EBB'))
+```
+
+## Chi-Squared Test
+### Chisq Function
+```{r}
+chisq.test(own_counts, p=market_share)
+chisq.test(fav_counts, p=market_share)
+```
+
+### Manual testing
+```{r}
+ts_fav <- sum((exp - fav_counts)^2/exp)
+ts_own <- sum((exp - own_counts)^2/exp)
+ts_fav
+ts_own
+```
+
+```{r}
+rslt <- c()
+for (i in 1:10000){
+  t <- sample(brands, sum(fav_counts), replace=TRUE, prob=market_share)
+  obs <- c()
+  for (j in 1:length(brands)){
+    obs[j] <- length(t[t == brands[j]])
+  }
+  rslt[i] <- sum((obs-exp)^2/exp)
+}
+```
+
+#### Graph of Test Statistic
+```{r}
+hist(rslt, main="Null Distribution", xlab="value", xlim=c(0, 30), freq=F, col="#363635")
+abline(v=ts_fav, lwd=5, col="red")
+abline(v=ts_own, lwd=5, col="blue")
+quantile(rslt, 0.95)
+quantile(rslt, 0.99)
+```
+
+#### Graph of Contributions to Test Statistic
+```{r}
+fav_contr <- as.data.frame(brands)
+colnames(fav_contr) <- c("Brand")
+fav_contr$Count <- (exp - fav_counts)^2/exp
+fav_contr$Type <- "Fav TS"
+
+own_contr <- as.data.frame(brands)
+colnames(own_contr) <- c("Brand")
+own_contr$Count <- (exp - own_counts)^2/exp
+own_contr$Type <- "Own TS"
+
+brand_data2 <- rbind(brand_data, fav_contr, own_contr)
+brand_data2$Type <- factor(brand_data2$Type, levels = c("Fav TS", "Favorite", "Expected", "Own", "Own TS"))
+
+brand_data2
+ggplot(data=brand_data2, aes(x=fct_reorder(Brand, Count, max, .desc=TRUE),y=Count, fill=Type)) +
+  geom_bar(stat="identity", position="dodge") +
+  xlab("Brand") +
+  ggtitle("Shoe Brand Data") +
+  scale_fill_manual('Type', values=c('#595A4A', '#53CA79', '#363635', '#A09EBB', '#A8AEC1'))
+```
+
+# Brand Data 3
+```{r}
+brand_data3 <- brand_data2[brand_data2$Type %in% c("Own TS", "Fav TS"),]
+ggplot(data=brand_data3, aes(x=fct_reorder(Brand, Count, mean, .desc=TRUE),y=Count, fill=Type)) +
+  geom_bar(stat="identity", position="dodge") +
+  xlab("Brand") +
+  ylab("Test Statistic Contribution") +
+  ggtitle("Test Statistic Contribution") +
+  scale_fill_manual('Type', values=c('#53CA79', '#A09EBB'))
+```
+
+
+#### Graph of Contributions to Test Statistic P2
+
+# Looking at Independence
+```{r}
+gender_fav_df <- as.data.frame(matrix(ncol = 6, nrow = 0))
+gender_own_df <- as.data.frame(matrix(ncol = 6, nrow = 0))
+gender_data <- split(data, data$Gender)
+gender_data2 <- rbind(gender_df, t(as.data.frame(table(gender_data$Female$Fav))[,-1]))
+
+for (gender in 1:length(gender_data)){
+  fav_table <- table(data$Fav[data$Gender == gender])
+  own_table <- table(data$Own[data$Gender == gender])
+  print(fav_table)
+  # print(own_table)
+  for (brand in brands){
+    # plug 0's in for columns that don't exist
+    # print(t_table[brand])
+  }
+}
+```
+
+```{r}
+# chisq.test(gender_data2)
+# gender_data3 <- as.data.frame(rbind(table(gender_data$Female$Fav), table(gender_data$Male$Fav)))
+# chisq.test(gender_data3)
+```
+

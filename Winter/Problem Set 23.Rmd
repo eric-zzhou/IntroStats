@@ -1,0 +1,74 @@
+---
+title: "Problem Set 23"
+author: "Eric Zhou"
+date: "2023-01-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+
+#### **Part a**: $H_0: p = 0.5, H_A: p \neq 0.5$
+
+#### **Part b**: Binomial distribution, $n=45, p=0.5$
+
+```{r}
+x <- seq(from=0, to=45)
+y <- dbinom(x, 45, 0.5)
+barplot(y, names.arg=x, xlab="# of support", ylab="probability")
+```
+
+#### **Part c**:
+
+```{r}
+qbinom(0.025, 45, 0.5)
+qbinom(0.975, 45, 0.5)
+```
+
+#### **Part d**:
+
+```{r}
+32/45
+```
+
+#### **Part e**:
+
+```{r}
+2 * pbinom(32, 45, 0.5, lower.tail=FALSE)
+```
+
+#### **Part f**: I would reject the null hypothesis because 0.002 \< 0.05
+
+#### **Part g**: -4 people would to get past the critical value.
+
+<br>
+
+## **Problem 2:** $H_0: p=0.85, H_A: p\neq0.85$
+
+#### **Part a**: 0 to 33 and 43 to 45 so 37 total.
+
+```{r}
+qbinom(0.975, 45, 0.85)
+qbinom(0.025, 45, 0.85)
+```
+
+#### **Part b**:
+
+```{r}
+binom.test(25, 30, p=0.85)
+```
+
+#### **Part c**: 2-sided because we are accounting for 2.5% on both
+
+#### **Part d**: Fail to reject null hypothesis since p value is 0.8.
+
+#### **Part e**:
+
+```{r}
+for (val in seq(0.9, 1, 0.05)){
+  print(binom.test(25, 30, p=val)$p.value)
+}
+```

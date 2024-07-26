@@ -1,0 +1,147 @@
+---
+title: "Assignment 9"
+author: "Eric Zhou"
+date: "2023-01-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# **Apprentice**
+
+## Problem 1
+
+#### **Part a**: $H_0: p_{Sounders}=p_{Seahawks}=p_{Mariners}=p_{Kraken}=p_{Reign}=p_{Storm}=p_{Sonics}$
+
+$H_A:$ Null hypothesis is false and there is statistical significance between supported teams
+
+#### There is statistical significance with only around 0.28% of the distribution being above this amount meaning we can reject the null hypothesis. We can also see the test statistic of 19.98 is larger than the critical value at around 12.59.
+
+```{r}
+obs <- c(16, 26, 15, 8, 12, 18, 5)
+exp <- rep(sum(obs)/7, 7)
+ts <- sum((obs-exp)^2/exp)
+ts
+qchisq(0.95, 6)
+pchisq(ts, 6, lower.tail = F)
+```
+
+#### **Part b**:
+
+```{r}
+data <- rchisq(10000, 6)
+hist(data, breaks=25, main="Seattle sport Teams Null Distribution", freq=FALSE, ylab="Probability", xlab="x")
+abline(v=qchisq(0.95, 6), col="green")
+abline(v=ts, col="red")
+x <- seq(min(data), max(data), by=0.01)
+lines(x=x, y=dchisq(x, 6), col="blue", type="l")
+```
+
+## Problem 2: Null hypothesis is that race and COVID death rate are independent from each other. We can reject the null hypothesis since the test statistic of 15.09 is higher than the critical point with only around 0.43% of the distribution higher than it. So we reject the null hypothesis that the King county race demographics from the 2018 factsheet and estimated COVID-19 deaths as of March 2021 are independent and in fact do have impacts on each other.
+
+```{r}
+covid <- c(929, 89, 249, 13, 122, 32)
+covid_pop <- c(0.648, 0.06, 0.152, 0.01, 0.089, 0.041)
+covid_exp <- covid_pop * sum(covid)
+ts <- sum((covid-covid_exp)^2/covid_exp)
+ts
+qchisq(0.99, 5)
+pchisq(ts, 5, lower.tail = F)
+```
+
+<br>
+
+# **Master**
+
+## Problem 3
+
+#### **Part a**:
+
+| Age        | 18-29 | 30-64 | 65+ | Total |
+|------------|-------|-------|-----|-------|
+| Support    | 49    | 35    | 24  | 108   |
+| Oppose     | 19    | 32    | 55  | 106   |
+| Don't Know | 19    | 11    | 6   | 36    |
+| Total      | 87    | 78    | 85  | 250   |
+
+#### **Part b**: We would reject the Null Hypothesis since the p-value is a lot lower than 0.05 which was the alpha value we set.
+
+```{r}
+obs <- c(49, 19, 19, 35, 32, 11, 24, 55, 6)
+wa_legis <- matrix(obs, 3, 3)
+chisq.test(wa_legis)
+```
+
+#### **Part c**:
+
+```{r}
+op <- c(108, 106, 36)
+ag <- c(87, 78, 85)
+exp <- c(op[1]*ag[1], op[2]*ag[1], op[3]*ag[1], op[1]*ag[2], op[2]*ag[2], op[3]*ag[2], op[1]*ag[3], op[2]*ag[3], op[3]*ag[3])/250
+obs - exp
+
+```
+
+#### **Part d**: It seems that the 18 - 29 group and 65+ groups had very different expected values from observed values while the 30 - 64 group was really accurate. The 18 - 29 has way less opposed and more supported than expected and the 65+ group has way more opposed than expected. According to this [Pew Research Article](https://www.pewresearch.org/fact-tank/2020/10/26/what-the-2020-electorate-looks-like-by-party-race-and-ethnicity-age-education-and-religion/), a majority of Republican voters are 50+. Looking at the charts, it seems that older generations lean more Republican and younger lean more Democrat (although it's not a huge divergence). Since Republicans want to lower taxes and Democrats generally want to impose/raise taxes, this could explain the difference in the data. It could also be that the younger generation think that short-term capital gain is a risky way to earn money and want people to invest long-term instead. Older people might have a stronger understanding of the market so are able to earn a lot and oppose taxes, or they might just not care and dislike taxes.
+
+<br>
+
+# **Wizard**
+
+## Problem 4
+
+#### **Part a**: The part the has the largest difference between expected and observed value is the contributes the most to the test statistic. The values show that Asians and Pacific Islanders (API) and Multi-racial are the 2 groups that contribute the most. Proportional to their respective population percentage, way less Asians got COVID and way more Multi-racial people got COVID. This may be due to multi-racial people being such a small percentage of the total population so even small numbers make it proportionally large. Not sure why less API people got COVID but it could be because it started in Asia so API people played safer. Multi-racial contributes 12.21074 and API was 4.418011.
+
+```{r}
+covid - covid_exp
+(covid - covid_exp)^2/covid_exp
+```
+
+#### **Part b**: With an alpha value of 0.01, the largest contribution of around 12.21 is less than the critical point of around 15.09, being less than around 3.20% of the distribution which is more than the 1%. However, with API combined in, it is 0.05% and therefore enough to be rejected. Basically, that one value being so far off made the null hypothesis very unlikely.
+
+```{r}
+qchisq(0.99, 5)
+pchisq(12.21074, 5, lower.tail = F)
+pchisq(12.21074 + 4.418011, 5, lower.tail = F)
+```
+
+#### **Part b corrections: Ignoring biracial, the p value increases by a lot, now being above our alpha value. Considering this, if we ignore biracial, which would seems to be an outlier, we would actually fail to reject the null hypothesis. Overall, I think it might be smart to have a larger sample size before making a decision but I would say fail to reject due to the small sample size and outlier in the smallest group.**
+
+```{r}
+qchisq(0.99, 4)
+ts2 <- sum(sort((covid - covid_exp)^2/covid_exp)[1:5])
+ts2
+pchisq(ts2, 4, lower.tail = F)
+```
+
+#### 
+
+#### **Part c**: Because it is squared and then divided by the expected value. This makes it so that all negative values become positive and rescaled based on their respective expected values. This is important since differences always are positive and that expected values affect the final value for contribution so the largest differences are not necessarily the largest contributors.
+
+## Problem 5: The contributions are pretty close to one another. They are not perfectly equal but the values are relatively close so they did contribute close amounts.
+
+```{r}
+x11 = 9
+x12 = 3
+x21 = 5
+x22 = 9
+x10 = x11 + x12
+x01 = x11 + x21
+x20 = x21 + x22
+x02 = x12 + x22
+obs <- c(x11, x12, x21, x22)
+exp <- c(x10 * x01, x10 * x02, x20 * x01, x20 * x02)/sum(obs)
+exp
+ts <- sum((exp - obs)^2/exp)
+ts
+pchisq(ts, 1, lower.tail = F)
+(exp - obs)^2/exp
+```
+
+```{r}
+obs - exp
+```
+
+The differences between observed and expected are the exact same, the only difference being the signs. However, being squared gets rid of the sign and the small difference is due to dividing by the expected value. Contributions in terms of residuals/error are the same but overall contributions to test statistic still has a tiny bit of variance.

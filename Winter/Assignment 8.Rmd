@@ -1,0 +1,246 @@
+---
+title: "Assignment 8"
+author: "Eric Zhou"
+date: "2023-01-03"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# **Apprentice**
+## Problem 1
+#### **Part a**: 
+```{r}
+rolls <- c()
+for (j in 1:1000) {
+  rolls[j] = sample(1:4, 1) + sample(1:8, 1)
+}
+head(rolls)
+length(rolls)
+```
+
+#### **Part b**: 
+```{r}
+barplot(table(rolls), ylab="Frequency", xlab="Rolls Sum", main="Sums of 1000 8-sided Dice and 4-sided Dice Rolls")
+```
+
+#### **Part c**: 
+```{r}
+roll_pos <- 2:12
+sim_prob <- c()
+for (j in roll_pos){
+  sim_prob[j - 1] = sum(rolls == j)/length(rolls)
+}
+true_prob <- c(1/32, 2/32, 3/32, 4/32, 4/32, 4/32, 4/32, 4/32, 3/32, 2/32, 1/32)
+df <- data.frame(roll_pos, sim_prob, true_prob)
+colnames(df) <- c("Roll Sum", "Simulated Probability", "True Probability")
+df
+```
+
+<br>
+
+## Problem 2
+```{r}
+skittle_col <- c(rep("P", 7), rep("R", 6), rep("Y", 5), rep("O", 4), rep("G", 3))
+skittle_bowl <- c(7, 6, 5, 4, 3)
+skittle_col
+```
+
+#### **Part a**: Around 2.97% chance to have 1 green, 1 red, and 2 purples.
+```{r}
+matches <- 0
+for (j in 1:10000){
+  curr <- sort(sample(skittle_col, 4, replace=FALSE))
+  if (identical(curr, c("G", "P", "P", "R"))) {
+    matches <- matches + 1
+  }
+}
+matches/10000
+```
+
+#### **Part b**: If I did it correctly, it should be around 2.99%
+```{r}
+7/25*6/24*6/23*3/22*4*3*2/2
+```
+
+#### **Part c**: Around 4.14% chance to have at least 3 yellows or at least 3 oranges.
+```{r}
+matches <- 0
+for (j in 1:10000){
+  curr <- sort(sample(skittle_col, 4, replace=TRUE))
+  if ((sum(curr == "Y") >= 3) || (sum(curr == "O") >= 3)) {
+    matches <- matches + 1
+  }
+}
+matches/10000
+```
+
+<br>
+
+# **Master**
+## Problem 3: Simulation shows there is around 6.12% chance of getting blackjack which is pretty close to the 6.06% I found for Assignment 3.
+```{r}
+cards <- c(rep(2:10, 4*2), rep(10, 3*4*2), rep(11, 4*2), -1, -1)
+matches <- 0
+for (j in 1:10000){
+  curr <- sort(sample(cards, 2, replace=FALSE))
+  if (sum(curr == -1) == 2) { # both are jokers
+    matches <- matches + 1
+  } else if (sum(curr == -1) == 1) { # 1 joker
+    if ((10 %in% curr) || (11 %in% curr)) {
+      matches <- matches + 1
+    }
+  } else if (sum(curr) == 21) { # no jokers
+      matches <- matches + 1
+  }
+}
+matches/10000
+```
+<br>
+
+
+# **Wizard**
+## Problem 4
+#### **Part a**: 
+```{r}
+options = c(-1, 1)
+color = 1
+plot_paths = sort(sample(1:1000, 5, replace=FALSE))
+ends = c()
+for (j in 1:1000){
+  path = c(0)
+  for (k in 2:250){
+    path[k] = path[k - 1] + sample(options, 1)
+  }
+  if (j %in% plot_paths) {
+    if (j == plot_paths[1]) {
+      plot(x=1:250, y=path, type="l", col=color, ylim=c(-20, 20), xlab="Step", ylab="Location", main="Random Walks")
+      color <- color + 1
+    } else {
+      lines(x=1:250, y=path, type="l", col=color)
+      color <- color + 1
+    }
+  }
+  ends[j] <- path[250]
+}
+```
+
+#### **Part b**: Mean is -0.57 and standard deviation is around 15.61.
+```{r}
+hist(ends, main="Ending Locations for Random Walks")
+mean(ends)
+sd(ends)
+```
+
+#### **Part c**: It fits pretty well.
+```{r}
+hist(ends, main="Ending Locations for Random Walks", freq=FALSE, breaks = 20)
+x <- seq(min(ends), max(ends), length=1000)
+y <- dnorm(x, mean=mean(ends), sd=sd(ends))
+lines(x, y, col="blue")
+```
+
+#### **Part d**: After more testing for ther resubmission, I have confirmed and disproved some of my previous statements (look at graphs below). Simulation number doesn't sseem to really affect standard deviation which looks random but does decrease the absolute value of the mean, which makes sense as it should go to 0 with more simulations. When varying number of steps, the standard deviation clearly rose which makes sense since more steps are taken so there could be larger variance. Same thing happened when varying step sizes. As for the mean, I expected step count to lower the absolute value of mean since more steps should go to 0 but it looked pretty random. The step size seems to increase the absolute value of mean but the change is not very large and may be just due to the higher standard deviation allowing it to have more extreme outliers. 
+```{r}
+sim_nums <- seq(25, 625, 25)
+step_counts <- seq(25, 625, 25)
+step_sizes <- 1:25
+```
+
+```{r}
+step_count <- step_counts[5]
+step_size <- step_sizes[1] * options
+means <- c()
+sds <- c()
+for (sim_num in 1:length(sim_nums)) {
+  ends = c()
+  for (j in 1:sim_nums[sim_num]){
+    path = c(0)
+    for (k in 2:step_count){
+      path[k] = path[k - 1] + sample(step_size, 1)
+    }
+    ends[j] <- path[step_count]
+  }
+  means[sim_num] <- mean(ends)
+  sds[sim_num] <- sd(ends)
+}
+data.frame(sim_nums, means, sds)
+plot(sim_nums, sds, col="blue")
+abline(lm(sds~sim_nums))
+plot(sim_nums, abs(means), col="green")
+abline(lm(abs(means)~sim_nums))
+```
+
+```{r}
+sim_num  <- sim_nums[10]
+step_size <- step_sizes[1] * options
+means <- c()
+sds <- c()
+for (step_count in 1:length(step_counts)) {
+  ends = c()
+  for (j in 1:sim_num){
+    path = c(0)
+    for (k in 2:step_counts[step_count]){
+      path[k] = path[k - 1] + sample(step_size, 1)
+    }
+    ends[j] <- path[step_counts[step_count]]
+  }
+  means[step_count] <- mean(ends)
+  sds[step_count] <- sd(ends)
+}
+data.frame(step_counts, means, sds)
+plot(step_counts, sds, col="blue")
+abline(lm(sds~step_counts))
+plot(step_counts, abs(means), col="green")
+abline(lm(abs(means)~step_counts))
+```
+
+```{r}
+sim_num  <- sim_nums[10]
+step_count <- step_counts[5]
+means <- c()
+sds <- c()
+for (step_size in 1:length(step_sizes)) {
+  ends = c()
+  for (j in 1:sim_num){
+    path = c(0)
+    for (k in 2:step_count){
+      path[k] = path[k - 1] + sample(step_sizes[step_size] * options, 1)
+    }
+    ends[j] <- path[step_count]
+  }
+  means[step_size] <- mean(ends)
+  sds[step_size] <- sd(ends)
+}
+data.frame(step_counts, means, sds)
+plot(step_counts, sds, col="blue")
+abline(lm(sds~step_counts))
+plot(step_counts, abs(means), col="green")
+abline(lm(abs(means)~step_counts))
+```
+
+
+#### **Part e**: As one would expect, the mean shifts while standard deviation is about the same as before. The mean is approximately the velocity multiplied by the step count since the velocity is the average move per step and you take step_count amount of steps so you would multiply. Standard deviation would be impacted if the range between the step choices were larger such as by scaling them.
+```{r}
+sim_num <- 500
+step_count <- 250
+velocity <- 0.5
+ends = c()
+for (j in 1:sim_num){
+  path = c(0)
+  for (k in 2:step_count){
+    path[k] = path[k - 1] + sample(options + velocity, 1)
+  }
+  ends[j] <- path[step_count]
+}
+hist(ends, main="Ending Locations for Random Walks", freq=FALSE, breaks = 20)
+x <- seq(min(ends), max(ends), length=sim_num)
+y <- dnorm(x, mean=mean(ends), sd=sd(ends))
+lines(x, y, col="blue")
+mean(ends)
+sd(ends)
+```
+

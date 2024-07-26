@@ -1,0 +1,118 @@
+---
+title: "Problem Set 28"
+author: "Eric Zhou"
+date: "2023-02-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**: 
+```{r}
+(90 - 88)/1.5
+(89.5-87)/2
+```
+
+#### **Part b**: Myan
+#### **Part c**: 
+```{r}
+x <- seq(81, 93, by=0.01)
+plot(x, dnorm(x, 88, 1.5), type="l", col="red")
+abline(v=90, col="red")
+lines(x, dnorm(x, 87, 2), type="l", col="blue")
+abline(v=89.5, col="blue")
+```
+
+<br>
+
+## **Problem 2**
+#### **Part a**:
+```{r}
+x <- seq(25 - 3 * 4.5, 25 + 3 * 4.5, by=0.01)
+plot(x, dnorm(x, 25, 4.5), type="l")
+```
+
+#### **Part b**: 
+```{r}
+pnorm(24, 25, 4.5) - pnorm(12, 25, 4.5)
+```
+
+#### **Part c**: 
+```{r}
+snow_data <- rnorm(2500, 25, 4.5)
+mean(snow_data)
+sd(snow_data)
+```
+
+#### **Part d**: 
+```{r}
+length(snow_data[snow_data < 24 & 12 < snow_data])
+```
+
+#### **Part e**: 
+```{r}
+1008/length(snow_data)
+```
+
+#### **Part f**:
+```{r}
+qnorm(0.05, 25, 4.5)
+qnorm(0.95, 25, 4.5)
+```
+
+#### **Part g**:
+```{r}
+1.5*4.5+25
+```
+
+<br>
+
+## **Problem 3**
+#### **Part a**: Expected to be 5 but depends on the luck of each game
+#### **Part b**: Y ~ N(5, 15.26434)
+```{r}
+10 * sqrt(2.33)
+```
+
+#### **Part c**: 5
+#### **Part d**: 
+```{r}
+pnorm(10, 5, 15.26434, lower.tail = F)
+```
+
+#### **Part e**: 
+```{r}
+qnorm(0.05, 5, 15.26434)
+qnorm(0.95, 5, 15.26434)
+```
+
+<br>
+
+## **Problem 4**
+#### **Part a**:
+```{r}
+blue <- c(31.281, 33.571, 41.401, 58.695, 51.440, 42.425, 42.122, 49.753, 35.356, 41.885, 43.353, 48.928, 37.646, 50.222, 59.239, 53.949, 47.855, 46.143, 47.511, 51.929, 44.075, 38.587, 47.826, 41.215, 49.217, 45.693, 39.078, 38.743, 50.796, 44.854, 57.276, 61.732, 43.724, 29.195, 57.059, 42.628, 47.349, 38.538, 42.407, 41.002)
+```
+
+#### **Part b**: 
+```{r}
+mean(blue)
+sd(blue)
+```
+
+#### **Part c**: 
+```{r}
+hist(blue)
+```
+
+#### **Part d**: 
+```{r}
+x <- seq(mean(blue) - 3 * sd(blue), mean(blue) + 3 * sd(blue), by=0.01)
+hist(blue, freq=F)
+lines(x, dnorm(x, mean(blue), sd(blue)))
+```
+
+#### **Part e**: Pretty good

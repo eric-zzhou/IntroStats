@@ -1,0 +1,130 @@
+---
+title: "Problem Set 18"
+author: "Eric Zhou"
+date: "2022-12-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+```{r}
+for (j in seq(1, 10)){
+  print(sum(sample(seq(1, 8), 1), sample(seq(1, 20), 1)))
+}
+```
+
+<br>
+
+## **Problem 2**
+```{r}
+results <- c()
+for (j in seq(1, 100)) {
+  tosses <- sample(c('H', 'T'), 12, replace=TRUE, prob = c(0.51, 0.49))
+  results[j] <- sum(tosses == 'H')
+}
+```
+
+#### **Part a**: Pretty normal distribution concentrated around 6 - 7 heads.
+```{r}
+barplot(table(results))
+```
+
+#### **Part b**: 17% had 8+ heads and 21% had less than 5.
+```{r}
+sum(results >= 8)/100
+sum(results < 5)/100
+```
+
+#### **Part c**: The mean is 5.94 heads and the standard deviation is 1.85 heads.
+```{r}
+mean(results)
+sd(results)
+```
+
+#### **Part d**: It varies a decent amount. I think I could reduce the variability by increasing the number of iterations the coin flips were done.
+
+<br>
+
+## **Problem 3**
+#### **Part a**: Null hypothesis: There will be perfectly equal split between people who play videogames and those who don't.
+#### **Part b**: Assuming 0.5 chance for both. 
+```{r}
+results <- c()
+n = 50
+for (i in seq(1, 10000)) {
+  a <- sample(c(0, 1), n, replace=TRUE)
+  results[i] <- sum(a/n)
+}
+hist(results, main="Null Distribution", xlab="Simulated Proportion")
+```
+
+#### **Part c**: It would be 31/50 or 0.62.
+#### **Part d**: Only 3.5% are greater than 31/50 people answering true assuming null hypothesis and the line is a bit off from the center. We would reject the null hypothesis since 3.5% is less than 5% so even with random chance it is very unlikely to occur. Using the 2-sided test, we see that double is greater than 5% though so I'm not sure what that means exactly.
+```{r}
+hist(results, main="Null Distribution", xlab="Simulated Proportion")
+abline(v=31/50, col="red")
+sum(results > 31/50)/length(results)
+2*sum(results > 31/50)/length(results)
+quantile(results, c(0.025, 0.975))
+```
+
+```{r}
+##################################################################################
+## calc.ts() is a custom function that calculates the test statistic for a given #
+##  bag based on the expected counts and candy colors.  The 'bag' is a vector of #
+##  different candy colors.  The 'colors' vector is needed to know which colors  #
+##  to test for.  The return value is the calculated test statistic.             #
+##################################################################################
+calc.ts <- function(bag, exp, colors){
+  ## create a vector that is the same length of exp to store the bag counts
+  obs <- vector("numeric", length(colors))
+  ## convert the bag into a list of counts of colors
+  for (i in 1:length(colors)) {
+    obs[i] <- sum(bag==colors[i])
+  }
+  ## calculate the test statistic
+  ts <- sum((obs-exp)^2/exp)
+  ## return the test statistic
+  return(ts)
+}
+
+##################################################################################
+# Main Program Loop:                                                             #
+##################################################################################
+
+## How many candies are in your bag?
+ncandies <- 57
+
+## What colors are in your bag?  (this may be different for skittles vs. sour patch)
+colors <- c("P", "R", "O", "Y", "G")
+## calculate the number of colors
+ncolors <- length(colors)
+
+## what are the expected counts
+exp <- rep(ncandies/ncolors, ncolors)
+
+## How many simulations in our null distribution?
+nsims <- 1000
+## Create empty storage for our null distribution
+nulldist <- vector("numeric", nsims)
+
+## for() loop to simulate the values in the null distribution 
+for(j in 1:nsims) {
+  ## draw a sample of candies from our bag
+  bag <- sample(colors, ncandies, replace=TRUE)
+  ## calculate the corresponding test statistic and store it
+  nulldist[j] <- calc.ts(bag, exp, colors)
+}
+hist(nulldist)
+
+```
+
+```{r}
+obs <- c(14, 11, 12, 11, 9)
+my.ts <- sum((obs-exp)^2/exp)
+my.ts
+```
+

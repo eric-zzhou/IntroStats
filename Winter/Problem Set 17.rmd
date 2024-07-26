@@ -1,0 +1,56 @@
+---
+title: "Problem Set 17"
+author: "Eric Zhou"
+date: "2022-12-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+```{r}
+rolls <- c()
+v <- sample(c(1:10), 2000, replace=TRUE)
+for (j in seq(10)) {
+  rolls[j] <- sum(v==j)
+}
+barplot(rolls/2000, names.arg=(1:10), xlab="Value", ylab="Probability", col="aquamarine", main="10-sided Dice Roll Simulation")
+abline(h=0.1)
+```
+
+## **Problem 2**
+```{r}
+methods <- c()
+v <- sample(c(1:5), prob=c(0.12, 0.08, 0.4, 0.3, 0.1), 1500, replace=TRUE)
+for (j in seq(5)) {
+  methods[j] <- sum(v==j)
+}
+barplot(methods/1500, names.arg=c("walk", "bike", "drive", "carpool", "bus"), xlab="Method", ylab="Probability", col="springgreen2", main="Transportation Methods Used Simulation")
+```
+
+## **Problem 3**
+```{r}
+votes <- c()
+v <- sample(c(1, 2), 400, replace=TRUE, prob=c(0.52, 0.48))
+
+votes[1] <- sum(v==1)
+votes[2] <- sum(v==2)
+
+barplot(votes/400, names.arg=c("Support","Oppose"), xlab="Outcome", ylab="Probability", col="cadetblue1", main="Poll Simulation", ylim=c(0, 0.6))
+abline(h=0.5)
+```
+
+## **Problem 4**: The histogram adheres pretty well to the normal distribution which makes sense. Looks like Riemann's sum from calculus.
+```{r}
+nd <- rnorm(500, mean=180, sd=22.5)
+hist(nd, main="Histogram of Normal Distribution", breaks=15, freq=FALSE, col="darkblue")
+## setup the range of x values
+x2 <- seq(from=90, to=270)
+## calculate the corresponding y values for the given normal
+y <- dnorm(x2, 180, 22.5) 
+## add the curve to the plot
+lines(x2, y, col="cyan1")
+```
+

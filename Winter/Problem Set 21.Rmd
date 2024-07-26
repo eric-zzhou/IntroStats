@@ -1,0 +1,92 @@
+---
+title: "Problem Set 21"
+author: "Eric Zhou"
+date: "2023-01-17"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## **Problem 1**
+#### **Part a**: n is 32, p is 36%, k depends on how many you are looking for to say that social media is their primary news source.
+#### **Part b**: Around a 10% chance.
+```{r}
+choose(32, 9)*(0.36)^9*(0.64)^23
+dbinom(9, 32, 0.36)
+```
+
+#### **Part c**: Expect around 11.52 people so round up to 12.
+```{r}
+0.36*32
+```
+
+#### **Part d**: Around 0.00006% which is very small. This makes sense since it's still possible for it to happen (64% raised to 32 power), it's just not a large chance.
+```{r}
+dbinom(0, 32, 0.36)
+0.64^32
+```
+
+#### **Part e**: 
+```{r}
+barplot(table(rbinom(10000, 32, 0.36)))
+```
+
+<br>
+
+## **Problem 2**
+#### **Part a**: n is 20, k is 11, p is 0.4. Around 7.10%
+```{r}
+dbinom(11, 20, 0.4)
+```
+
+#### **Part b**: Expect 8 with standard deviation of 2.19.
+```{r}
+20 * 0.4
+sqrt(20 * 0.4 * 0.6)
+```
+
+#### **Part c**: ~87.25%
+```{r}
+tot <- 0
+for (i in 0:10){
+  tot <- tot + dbinom(i, 20, 0.4)
+}
+tot
+```
+
+#### **Part d**: 12.75%
+```{r}
+tot <- 0
+for (i in 11:20){
+  tot <- tot + dbinom(i, 20, 0.4)
+}
+tot
+```
+
+<br>
+
+## **Problem 3**
+#### **Part a**: 1 and 6
+#### **Part b**: 
+```{r}
+(1 + 6) / 2
+sum(c(1:6)/6)
+```
+
+#### **Part c**: 
+```{r}
+((6-1+1)^2-1)/12
+ex <- sum(c(1:6)/6)
+ex2 <- sum(c(1:6)^2/6)
+sum(ex2 - ex^2)
+```
+
+<br>
+
+## **Problem 4**
+#### **Part a**: Normal distribution concentrated at the middle.
+#### **Part b**: Choosing 0 from n, all false, does not affect distribution. It's just the very first bar.
+#### **Part c**: Choosing n from n, all true, does not affect distribution. It's just the very last bar.
+#### **Part d**: You are just summing up every possibility which adds up to 1.
